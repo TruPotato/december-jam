@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" uid="uid://cnccg6pbdd32d" path="res://Scripts/Gameplay/basic_player_movement.gd" id="1_yx20t"]
 [ext_resource type="Texture2D" uid="uid://b8sint31hci7a" path="res://Graphics/grey_square.png" id="2_lvb5c"]
-[ext_resource type="Script" uid="uid://pdxj8qdacten" path="res://Scripts/temporary_door.gd" id="3_dorj5"]
+[ext_resource type="Script" path="res://Scripts/temporary_door.gd" id="3_dorj5"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_lvb5c"]
 size = Vector2(40, 40)

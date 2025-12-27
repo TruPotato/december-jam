@@ -3,6 +3,7 @@ extends CharacterBody2D
 const GRAVITY = 9.8
 const H_SPEED = 200.0
 const JUMP_VELOCITY = 500.0
+var jumped = false;
 
 # When first loaded.
 func _ready():
@@ -36,8 +37,9 @@ func main_input_loop():
 	if Input.is_action_just_pressed("jump") and is_on_floor():
 		# Jump.
 		velocity.y -= JUMP_VELOCITY
-	if Input.is_action_just_released("jump"):
+	if Input.is_action_just_released("jump") and velocity.y < 0 and !jumped:
 		velocity.y += (JUMP_VELOCITY / 2);
+		jumped = true;
 
 # Apply gravity.
 func passive_gravity():
@@ -50,3 +52,4 @@ func passive_gravity():
 		# Set downwards velocity to zero if it is positive.
 		if velocity.y > 0.0:
 			velocity.y = 0.0
+		jumped = false;
