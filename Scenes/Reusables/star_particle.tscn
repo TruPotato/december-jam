@@ -1,0 +1,66 @@
+[gd_scene load_steps=10 format=3 uid="uid://d145sysh30f4t"]
+
+[ext_resource type="Script" uid="uid://222xg40eadre" path="res://Scripts/Visuals/star_particle.gd" id="1_glr6h"]
+[ext_resource type="Texture2D" uid="uid://b8hx430twgqr4" path="res://Graphics/star_particles.png" id="1_pl465"]
+[ext_resource type="AudioStream" uid="uid://fm4wq38xueox" path="res://Audio/star_bounce.wav" id="3_lhe6y"]
+
+[sub_resource type="PhysicsMaterial" id="PhysicsMaterial_eh6rn"]
+friction = 0.3
+bounce = 0.9
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_eh6rn"]
+size = Vector2(8, 8)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_11jsg"]
+atlas = ExtResource("1_pl465")
+region = Rect2(0, 0, 8, 8)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_x4ypu"]
+atlas = ExtResource("1_pl465")
+region = Rect2(8, 0, 8, 8)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_ltuxi"]
+atlas = ExtResource("1_pl465")
+region = Rect2(16, 0, 8, 8)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_1iqhd"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_11jsg")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_x4ypu")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_ltuxi")
+}],
+"loop": true,
+"name": &"default",
+"speed": 6.0
+}]
+
+[node name="StarParticle" type="RigidBody2D"]
+top_level = true
+collision_layer = 0
+physics_material_override = SubResource("PhysicsMaterial_eh6rn")
+gravity_scale = 0.4
+lock_rotation = true
+contact_monitor = true
+max_contacts_reported = 1
+script = ExtResource("1_glr6h")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(0, -4)
+shape = SubResource("RectangleShape2D_eh6rn")
+
+[node name="StarSprite" type="AnimatedSprite2D" parent="."]
+sprite_frames = SubResource("SpriteFrames_1iqhd")
+autoplay = "default"
+frame_progress = 0.49383882
+offset = Vector2(0, -4)
+
+[node name="Blink" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("3_lhe6y")
+volume_db = -2.0
+bus = &"SFX"

@@ -1,5 +1,6 @@
-[gd_scene load_steps=15 format=4 uid="uid://df0lwtrsnbyhr"]
+[gd_scene load_steps=16 format=4 uid="uid://df0lwtrsnbyhr"]
 
+[ext_resource type="PackedScene" uid="uid://gnxm0jmfcopl" path="res://Scenes/Reusables/basic_enemy.tscn" id="1_8y5mx"]
 [ext_resource type="PackedScene" uid="uid://bt2dxigvk0kth" path="res://Scenes/player.tscn" id="1_dorj5"]
 [ext_resource type="PackedScene" path="res://Scenes/dr_houser_goomba.tscn" id="1_o1aaj"]
 [ext_resource type="Texture2D" uid="uid://b8sint31hci7a" path="res://Graphics/grey_square.png" id="2_lvb5c"]
@@ -69,6 +70,9 @@ sources/0 = SubResource("TileSetAtlasSource_8y5mx")
 
 [node name="Node2D" type="Node2D"]
 
+[node name="BasicEnemy" parent="." instance=ExtResource("1_8y5mx")]
+position = Vector2(200, 368)
+
 [node name="DrHouserGoomba" parent="." instance=ExtResource("1_o1aaj")]
 visible = false
 position = Vector2(505, 289)
@@ -83,6 +87,8 @@ limit_bottom = 506
 
 [node name="PlayerNode" parent="." instance=ExtResource("1_dorj5")]
 position = Vector2(-66, 436)
+collision_layer = 2
+collision_mask = 3
 
 [node name="OldLayer" type="TileMapLayer" parent="."]
 visible = false
