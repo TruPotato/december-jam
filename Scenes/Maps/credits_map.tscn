@@ -1,0 +1,24 @@
+[gd_scene format=3 uid="uid://dc2kfifgkpj2q"]
+
+[node name="Node2D" type="Node2D"]
+
+[node name="ColorRect" type="ColorRect" parent="."]
+offset_left = -24.0
+offset_top = -14.0
+offset_right = 1217.0
+offset_bottom = 745.0
+color = Color(0, 0, 0, 1)
+
+[node name="Label" type="Label" parent="."]
+offset_left = 416.00003
+offset_top = 178.00002
+offset_right = 509.00003
+offset_bottom = 357.0
+scale = Vector2(3.923944, 2.3143184)
+text = "THE END
+
+los creditos:
+PAUL
+TRUPO
+CASEY
+SQUARE"
