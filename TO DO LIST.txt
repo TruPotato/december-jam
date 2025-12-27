@@ -1,8 +1,8 @@
 
 
 THINGS TO DO:
-	- player movement calculations and feel
-	- basic enemy code
-	- health
-	- lose condition
+	- ✓ player movement calculations and feel
+	-   basic enemy code
+	-   health
+	-   lose condition
 	

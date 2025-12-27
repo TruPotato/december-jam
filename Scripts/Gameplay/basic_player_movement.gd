@@ -1,30 +1,33 @@
 extends CharacterBody2D
 
-const GRAVITY = 10;
-const GRAVITY_MULT = 3.5;
-const H_SPEED = 200.0
-const AIR_FRICTION = 18;
-const GROUND_FRICTION = 30;
-const JUMP_VELOCITY = 500.0
+const GRAVITY = 10; # Base gravity
+const GRAVITY_MULT = 3.5; # Multiplier to apply when falling
+const H_SPEED = 200.0 # Base horizontal speed
+const AIR_FRICTION = 18; # Friction in the air (determines how much control you have while airborne)
+const GROUND_FRICTION = 30; # Friction on the ground (same as AIR_FRICTION but for the ground)
+const JUMP_VELOCITY = 500.0 # Code says jump, this says how high
 
-enum {
+# An "enum" or "Enumerator" is a list of variables that equate to integer values; for example, GROUNDED = 0, and AIRBORNE = 1.
+enum { # These are possible gameplay states. It will probably become longer later!
 	GROUNDED,
 	AIRBORNE
 }
 
-var jumped = false;
-var state = AIRBORNE;
+var jumped = false; # Variable for determining if coyote time still applies and if downward velocity should be applied when releasing jump
+var state = GROUNDED; # Sets the default state to GROUNDED or 0.
 
-var coyote_default = 10;
-var coyote_time;
+var health = 3; # Default health value.
 
-# When first loaded.
+var coyote_default = 10; # Default coyote time so we can reset to it after each fall.
+var coyote_time; # Sets itself to the default when grounded; "coyote time" determines how long after leaving a ledge you can still jump.
+
+# When first loaded:
 func _ready():
-	coyote_time = coyote_default;
-	floor_snap_length = 3.5;
-	floor_constant_speed = true;
+	coyote_time = coyote_default; # Set coyote time to itself
+	floor_snap_length = 3.5; # Set the floor snap length to 3.5. This allows built in godot functions to lock the player to slopes.
+	floor_constant_speed = true; # Disables moving slowly when going up slopes. We can change this later.
 
-# The main physics loop.
+# The main loop.
 func _physics_process(_delta):
 	$Floored.text = "iof: " + str(is_on_floor()); # Display whether the "is_on_floor()" check returns true
 	$FloorNormal.text = "vel: " + str(velocity); # Display velocity
@@ -35,47 +38,49 @@ func _physics_process(_delta):
 	# Apply physics and move.
 	move_and_slide()
 
-# Fetch the player's directional input.
+# Get the player's directional input.
 func get_directional_input():
 	var result = Vector2.ZERO
-	result = Input.get_vector("move_left", "move_right", "move_up", "move_down")
+	result = Input.get_vector("move_left", "move_right", "move_up", "move_down") # Uses inputs to generate a Vector2.
 	return result
 
 # Change the way the player moves based on the current type of action
 func state_machine(_delta):
-	match state:
+	match state: # Check the current state and run some code based on its value
 		GROUNDED:
 			grounded(_delta);
 		AIRBORNE:
 			airborne(_delta);
 
-func grounded(_delta):
+func grounded(_delta): # Grounded actions
 	# Get player input and do movement
 	movement(get_directional_input(), GROUND_FRICTION)
 
-	if Input.is_action_just_pressed("jump"):
-		# Jump.
+	if Input.is_action_just_pressed("jump"): # If the player pressed the jump button...
+		# ...jump.
 		jump();
 
-	if !is_on_floor():
+	if !is_on_floor(): # If we leave the ground for any reason, switch states to AIRBORNE.
 		state = AIRBORNE;
 
-func airborne(_delta):
+func airborne(_delta): # Airboren actions
 	# Get player input and do movement
 	movement(get_directional_input(), AIR_FRICTION);
 
-	# Apply gravity stronger if we are falling
+	# Apply gravity. If velocity is lower than zero, just apply it normally; otherwise add a multiplier to make for a nicer jump arc.
 	if velocity.y < 0:
 		velocity.y += GRAVITY;
 	else:
 		velocity.y += GRAVITY * GRAVITY_MULT;
 	
-	# If we have already jumped, make releasing the button set velocity to something low
-	# If we have not, give the player an airborne jump
 	if !jumped:
+		# If we have already jumped, make releasing the button set velocity downward slightly so we can short hop.
+		# this kind of makes the variable name confusing... i'll have to figure out a better name for it.
 		if Input.is_action_just_released("jump") and velocity.y < 0:
 			velocity.y = -10.0;
 			jumped = true;
+
+		# If we have not already jumped and we have some coyote time remaining, let the player jump in the air.
 		if Input.is_action_just_pressed("jump") and coyote_time > 0:
 			jump();
 	
@@ -83,14 +88,16 @@ func airborne(_delta):
 	if coyote_time > 0:
 		coyote_time -= 1;
 
-	if is_on_floor():
+	if is_on_floor(): # If we hit the ground, switch states to GROUNDED and reset some variables.
 		state = GROUNDED
 		jumped = false;
 		coyote_time = coyote_default;
 
 # Does the movement, applying friction as necessary.
 func movement(direction, friction):
-	# Check if direction is zero. If it isn't, move velocity in the direction, ramping up speed. If it is, move velocity back towards 0
+	# Check if direction is zero.
+	# If it isn't, move velocity in the input direction, ramping up speed until a maximum.
+	# If it is, move velocity back towards 0
 	if direction != Vector2.ZERO:
 		velocity.x = clampf(velocity.x + direction.x * friction, -H_SPEED, H_SPEED);
 	else:
@@ -102,15 +109,5 @@ func jump():
 	# i doubt this will get more complex than this but just in case i am making it a function so i don't have repeat code
 	velocity.y = -JUMP_VELOCITY;
 
-# Apply gravity.
-func passive_gravity():
-	if not is_on_floor(): # <- seems like this has been fixed and works normally now! -trupo
-		# Player is falling.
-		# Downwards de-acceleration.
-		velocity.y += GRAVITY
-	else:
-		# Player is on floor.
-		# Set downwards velocity to zero if it is positive.
-		if velocity.y > 0.0:
-			velocity.y = 0.0;
-		jumped = false;
+func die():
+	pass # TODO: die
