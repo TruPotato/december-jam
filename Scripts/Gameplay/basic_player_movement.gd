@@ -2,19 +2,31 @@ extends CharacterBody2D
 
 const GRAVITY = 9.8
 const H_SPEED = 200.0
+const AIR_CONTROL = 10;
 const JUMP_VELOCITY = 500.0
+
+enum {
+	GROUNDED,
+	AIRBORNE,
+	SLOPE
+}
+
 var jumped = false;
+var state = AIRBORNE;
+
+var coyote_default = 10;
+var coyote_time;
 
 # When first loaded.
 func _ready():
-	pass
+	coyote_time = coyote_default;
 
 # The main physics loop.
 func _physics_process(_delta):
-	# Get the player's main input.
-	main_input_loop()
-	# Apply gravity.
-	passive_gravity()
+	$Label.text = "iof: " + str(is_on_floor()); # Display whether the "is_on_floor()" check returns true
+	# Decide what kind of action the player is doing
+	state_machine(_delta)
+
 	# Apply physics and move.
 	move_and_slide()
 
@@ -23,6 +35,54 @@ func get_directional_input():
 	var result = Vector2.ZERO
 	result = Input.get_vector("move_left", "move_right", "move_up", "move_down")
 	return result
+
+func state_machine(_delta):
+	match state:
+		GROUNDED:
+			grounded(_delta);
+		AIRBORNE:
+			airborne(_delta);
+		SLOPE:
+			slope(_delta);
+
+func grounded(_delta):
+	# Get player input
+	main_input_loop();
+	if !is_on_floor():
+		state = AIRBORNE;
+
+func airborne(_delta):
+	# Get player input
+	var direction = get_directional_input();
+
+	# if we are inputting a direction
+	if direction != Vector2.ZERO:
+		velocity.x = clamp(velocity.x + direction.x * AIR_CONTROL, -H_SPEED, H_SPEED);
+	else:
+		if velocity.x > 0:
+			velocity.x += clamp(0 - AIR_CONTROL, -10, 0);
+		if velocity.x < 0:
+			velocity.x -= clamp(0 - AIR_CONTROL, -10, 0);
+
+	# Apply gravity
+	velocity.y += GRAVITY;
+	if coyote_time > 0:
+		coyote_time -= 1;
+
+	if !jumped:
+		if Input.is_action_just_released("jump") and velocity.y < 0:
+			velocity.y = -10.0;
+			jumped = true;
+		if Input.is_action_just_pressed("jump") and coyote_time > 0:
+			jump();
+
+	if is_on_floor():
+		state = GROUNDED
+		jumped = false;
+		coyote_time = coyote_default;
+
+func slope(_delta):
+	pass
 
 # The main input loop.
 func main_input_loop():
@@ -36,14 +96,16 @@ func main_input_loop():
 	
 	if Input.is_action_just_pressed("jump") and is_on_floor():
 		# Jump.
-		velocity.y -= JUMP_VELOCITY
-	if Input.is_action_just_released("jump") and velocity.y < 0 and !jumped:
-		velocity.y += (JUMP_VELOCITY / 2);
-		jumped = true;
+		jump();
+		state = AIRBORNE;
+
+func jump():
+	# i doubt this will get more complex than this but just in case i am making it a function so i don't have repeat code
+	velocity.y -= JUMP_VELOCITY;
 
 # Apply gravity.
 func passive_gravity():
-	if not is_on_floor(): # <- trupo doesn't like this.
+	if not is_on_floor(): # <- seems like this has been fixed and works normally now! -trupo
 		# Player is falling.
 		# Downwards de-acceleration.
 		velocity.y += GRAVITY
@@ -51,5 +113,5 @@ func passive_gravity():
 		# Player is on floor.
 		# Set downwards velocity to zero if it is positive.
 		if velocity.y > 0.0:
-			velocity.y = 0.0
+			velocity.y = 0.0;
 		jumped = false;
