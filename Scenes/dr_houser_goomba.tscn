@@ -1,0 +1,15 @@
+[gd_scene load_steps=3 format=3 uid="uid://c6go8vbjw73tu"]
+
+[ext_resource type="Texture2D" uid="uid://sion5fa01v42" path="res://Graphics/test_image.jpg" id="1_ednjt"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_r5e6g"]
+size = Vector2(16, 16)
+
+[node name="DrHouserGoomba" type="CharacterBody2D"]
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+scale = Vector2(0.08421052, 0.19999999)
+texture = ExtResource("1_ednjt")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("RectangleShape2D_r5e6g")
