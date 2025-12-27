@@ -3,13 +3,13 @@ extends CharacterBody2D
 const GRAVITY = 10;
 const GRAVITY_MULT = 3.5;
 const H_SPEED = 200.0
-const AIR_CONTROL = 18;
+const AIR_FRICTION = 18;
+const GROUND_FRICTION = 30;
 const JUMP_VELOCITY = 500.0
 
 enum {
 	GROUNDED,
-	AIRBORNE,
-	SLOPE
+	AIRBORNE
 }
 
 var jumped = false;
@@ -21,10 +21,14 @@ var coyote_time;
 # When first loaded.
 func _ready():
 	coyote_time = coyote_default;
+	floor_snap_length = 3.5;
+	floor_constant_speed = true;
 
 # The main physics loop.
 func _physics_process(_delta):
-	$Label.text = "iof: " + str(is_on_floor()); # Display whether the "is_on_floor()" check returns true
+	$Floored.text = "iof: " + str(is_on_floor()); # Display whether the "is_on_floor()" check returns true
+	$FloorNormal.text = "vel: " + str(velocity); # Display velocity
+
 	# Decide what kind of action the player is doing
 	state_machine(_delta)
 
@@ -37,33 +41,28 @@ func get_directional_input():
 	result = Input.get_vector("move_left", "move_right", "move_up", "move_down")
 	return result
 
+# Change the way the player moves based on the current type of action
 func state_machine(_delta):
 	match state:
 		GROUNDED:
 			grounded(_delta);
 		AIRBORNE:
 			airborne(_delta);
-		SLOPE:
-			slope(_delta);
 
 func grounded(_delta):
-	# Get player input
-	main_input_loop();
+	# Get player input and do movement
+	movement(get_directional_input(), GROUND_FRICTION)
+
+	if Input.is_action_just_pressed("jump"):
+		# Jump.
+		jump();
+
 	if !is_on_floor():
 		state = AIRBORNE;
 
 func airborne(_delta):
-	# Get player input
-	var direction = get_directional_input();
-
-	# if we are inputting a direction
-	if direction != Vector2.ZERO:
-		velocity.x = clamp(velocity.x + direction.x * AIR_CONTROL, -H_SPEED, H_SPEED);
-	else:
-		if velocity.x > 0:
-			velocity.x += clamp(0 - AIR_CONTROL, -10, 0);
-		if velocity.x < 0:
-			velocity.x -= clamp(0 - AIR_CONTROL, -10, 0);
+	# Get player input and do movement
+	movement(get_directional_input(), AIR_FRICTION);
 
 	# Apply gravity stronger if we are falling
 	if velocity.y < 0:
@@ -89,23 +88,15 @@ func airborne(_delta):
 		jumped = false;
 		coyote_time = coyote_default;
 
-func slope(_delta):
-	pass
-
-# The main input loop.
-func main_input_loop():
-	var input_result = get_directional_input()
-	if input_result.x != 0.0:
-		# If the player is moving horizontally.
-		velocity.x = input_result.x * H_SPEED
+# Does the movement, applying friction as necessary.
+func movement(direction, friction):
+	# Check if direction is zero. If it isn't, move velocity in the direction, ramping up speed. If it is, move velocity back towards 0
+	if direction != Vector2.ZERO:
+		velocity.x = clampf(velocity.x + direction.x * friction, -H_SPEED, H_SPEED);
 	else:
-		# If they player isn't moving.
-		velocity.x = 0.0
-	
-	if Input.is_action_just_pressed("jump") and is_on_floor():
-		# Jump.
-		jump();
-		state = AIRBORNE;
+		if velocity.x != 0:
+			velocity.x += clampf(0 - velocity.x, -friction, friction)
+
 
 func jump():
 	# i doubt this will get more complex than this but just in case i am making it a function so i don't have repeat code
