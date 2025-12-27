@@ -1,9 +1,9 @@
 extends CharacterBody2D
 
-const GRAVITY = 9.8
-const GRAVITY_MULT = 3;
+const GRAVITY = 10;
+const GRAVITY_MULT = 3.5;
 const H_SPEED = 200.0
-const AIR_CONTROL = 20;
+const AIR_CONTROL = 18;
 const JUMP_VELOCITY = 500.0
 
 enum {
@@ -109,7 +109,7 @@ func main_input_loop():
 
 func jump():
 	# i doubt this will get more complex than this but just in case i am making it a function so i don't have repeat code
-	velocity.y -= JUMP_VELOCITY;
+	velocity.y = -JUMP_VELOCITY;
 
 # Apply gravity.
 func passive_gravity():
