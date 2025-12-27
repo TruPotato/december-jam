@@ -36,6 +36,8 @@ func main_input_loop():
 	if Input.is_action_just_pressed("jump") and is_on_floor():
 		# Jump.
 		velocity.y -= JUMP_VELOCITY
+	if Input.is_action_just_released("jump"):
+		velocity.y += (JUMP_VELOCITY / 2);
 
 # Apply gravity.
 func passive_gravity():
