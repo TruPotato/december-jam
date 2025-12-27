@@ -1,8 +1,9 @@
 extends CharacterBody2D
 
 const GRAVITY = 9.8
+const GRAVITY_MULT = 3;
 const H_SPEED = 200.0
-const AIR_CONTROL = 10;
+const AIR_CONTROL = 20;
 const JUMP_VELOCITY = 500.0
 
 enum {
@@ -64,17 +65,24 @@ func airborne(_delta):
 		if velocity.x < 0:
 			velocity.x -= clamp(0 - AIR_CONTROL, -10, 0);
 
-	# Apply gravity
-	velocity.y += GRAVITY;
-	if coyote_time > 0:
-		coyote_time -= 1;
-
+	# Apply gravity stronger if we are falling
+	if velocity.y < 0:
+		velocity.y += GRAVITY;
+	else:
+		velocity.y += GRAVITY * GRAVITY_MULT;
+	
+	# If we have already jumped, make releasing the button set velocity to something low
+	# If we have not, give the player an airborne jump
 	if !jumped:
 		if Input.is_action_just_released("jump") and velocity.y < 0:
 			velocity.y = -10.0;
 			jumped = true;
 		if Input.is_action_just_pressed("jump") and coyote_time > 0:
 			jump();
+	
+	# Decrease coyote time if we have not run out
+	if coyote_time > 0:
+		coyote_time -= 1;
 
 	if is_on_floor():
 		state = GROUNDED
