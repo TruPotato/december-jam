@@ -1,11 +1,13 @@
 extends CharacterBody2D
 
-const GRAVITY = 10; # Base gravity
-const GRAVITY_MULT = 3.5; # Multiplier to apply when falling
-const H_SPEED = 200.0 # Base horizontal speed
-const AIR_FRICTION = 18; # Friction in the air (determines how much control you have while airborne)
-const GROUND_FRICTION = 30; # Friction on the ground (same as AIR_FRICTION but for the ground)
-const JUMP_VELOCITY = 500.0 # Code says jump, this says how high
+const PIXEL_SCALE = 0.4 # Temporary, for scaling the physics down to pixel size.
+
+const GRAVITY = 7.5; # Base gravity NOTE: (Casey) I temporarily changed this to be lower from 10.0, feel free to revert it later.
+const GRAVITY_MULT = 3.5 * PIXEL_SCALE; # Multiplier to apply when falling
+const H_SPEED = 200.0 * PIXEL_SCALE # Base horizontal speed
+const AIR_FRICTION = 18 * PIXEL_SCALE; # Friction in the air (determines how much control you have while airborne)
+const GROUND_FRICTION = 30 * PIXEL_SCALE; # Friction on the ground (same as AIR_FRICTION but for the ground)
+const JUMP_VELOCITY = 500.0 * PIXEL_SCALE # Code says jump, this says how high
 
 # An "enum" or "Enumerator" is a list of variables that equate to integer values; for example, GROUNDED = 0, and AIRBORNE = 1.
 enum { # These are possible gameplay states. It will probably become longer later!
@@ -20,6 +22,13 @@ var health = 3; # Default health value.
 
 var coyote_default = 10; # Default coyote time so we can reset to it after each fall.
 var coyote_time; # Sets itself to the default when grounded; "coyote time" determines how long after leaving a ledge you can still jump.
+
+# Animation related variables.
+var moving_right = true # If velocity.x is positive.
+var just_landed = false # Set to true if player has just landed.
+
+@onready var player_sprite = $PlayerSprite # The sprite node.
+@onready var sfx = $PlayerSFX
 
 # When first loaded:
 func _ready():
@@ -37,6 +46,9 @@ func _physics_process(_delta):
 
 	# Apply physics and move.
 	move_and_slide()
+	
+	# Update the player sprite.
+	animation_update()
 
 # Get the player's directional input.
 func get_directional_input():
@@ -92,6 +104,7 @@ func airborne(_delta): # Airboren actions
 		state = GROUNDED
 		jumped = false;
 		coyote_time = coyote_default;
+		just_landed = true # Set for the sake of animation.
 
 # Does the movement, applying friction as necessary.
 func movement(direction, friction):
@@ -108,6 +121,50 @@ func movement(direction, friction):
 func jump():
 	# i doubt this will get more complex than this but just in case i am making it a function so i don't have repeat code
 	velocity.y = -JUMP_VELOCITY;
+	sfx.play_sfx(sfx.JUMP)
 
 func die():
 	pass # TODO: die
+
+# Update the player's sprite.
+func animation_update():
+	# Set player facing direction.
+	if velocity.x > 0.0 and moving_right == false:
+		player_sprite.flip_h = false
+		moving_right = true
+	else:
+		if velocity.x < 0.0 and moving_right == true:
+			player_sprite.flip_h = true
+			moving_right = false
+	
+	# Check if the player just landed.
+	if just_landed == true:
+		just_landed = false
+		player_sprite.change_animation_state(player_sprite.STATES.LANDING)
+	
+	var player_walking = false
+	# Check is player is airborne.
+	match state:
+		GROUNDED:
+			# Player is on the ground.
+			if velocity.x == 0.0:
+				# Player is still.
+				player_sprite.change_animation_state(player_sprite.STATES.IDLE)
+			else:
+				# Player is walking, or at least moving horizontally on the ground.
+				player_sprite.change_animation_state(player_sprite.STATES.WALKING)
+				player_walking = true
+		AIRBORNE:
+			# Player is in the air.
+			if velocity.y < 0.0:
+				# Player is rising.
+				player_sprite.change_animation_state(player_sprite.STATES.RISING)
+			else:
+				# Player is falling.
+				player_sprite.change_animation_state(player_sprite.STATES.FALLING)
+	
+	# Set the player's walking sounds.
+	if player_walking == true:
+		sfx.walk_loop()
+	else:
+		sfx.walk_stop()
