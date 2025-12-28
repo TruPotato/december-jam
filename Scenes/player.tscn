@@ -1,4 +1,4 @@
-[gd_scene load_steps=22 format=3 uid="uid://bt2dxigvk0kth"]
+[gd_scene load_steps=23 format=3 uid="uid://bt2dxigvk0kth"]
 
 [ext_resource type="Script" uid="uid://cnccg6pbdd32d" path="res://Scripts/Gameplay/basic_player_movement.gd" id="1_v0iea"]
 [ext_resource type="Texture2D" uid="uid://b78l5uba8tn3e" path="res://Graphics/skele1.png" id="2_cvnsp"]
@@ -131,6 +131,10 @@ _data = {
 &"StepLoop": SubResource("Animation_3smsa")
 }
 
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_3smsa"]
+radius = 7.0
+height = 18.0
+
 [node name="PlayerNode" type="CharacterBody2D"]
 collision_layer = 0
 script = ExtResource("1_v0iea")
@@ -145,6 +149,14 @@ script = ExtResource("3_vgqql")
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 position = Vector2(0, -10)
 shape = SubResource("CapsuleShape2D_v0iea")
+
+[node name="State" type="Label" parent="."]
+offset_left = -13.0
+offset_top = -46.0
+offset_right = 27.0
+offset_bottom = -37.0
+text = "TEST"
+label_settings = SubResource("LabelSettings_vgqql")
 
 [node name="Floored" type="Label" parent="."]
 offset_left = -13.0
@@ -167,6 +179,7 @@ label_settings = SubResource("LabelSettings_vgqql")
 [node name="CollisionShape2D" type="CollisionShape2D" parent="JumpHit"]
 position = Vector2(0, -2)
 shape = SubResource("RectangleShape2D_v0iea")
+debug_color = Color(0, 0.7, 0.116666555, 0.41960785)
 
 [node name="PlayerSFX" type="Node" parent="."]
 script = ExtResource("5_fkybt")
@@ -185,3 +198,12 @@ bus = &"SFX"
 libraries = {
 &"": SubResource("AnimationLibrary_8erm5")
 }
+
+[node name="ReceiveDamage" type="Area2D" parent="."]
+collision_layer = 4
+collision_mask = 4
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="ReceiveDamage"]
+position = Vector2(0, -10)
+shape = SubResource("CapsuleShape2D_3smsa")
+debug_color = Color(0.7, 0.48999998, 0, 0.41960785)

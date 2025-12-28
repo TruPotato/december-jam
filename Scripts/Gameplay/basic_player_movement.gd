@@ -8,11 +8,14 @@ const H_SPEED = 200.0 * PIXEL_SCALE # Base horizontal speed
 const AIR_FRICTION = 18 * PIXEL_SCALE; # Friction in the air (determines how much control you have while airborne)
 const GROUND_FRICTION = 30 * PIXEL_SCALE; # Friction on the ground (same as AIR_FRICTION but for the ground)
 const JUMP_VELOCITY = 500.0 * PIXEL_SCALE # Code says jump, this says how high
+const IFRAMES = 60 # invincibility frames
 
 # An "enum" or "Enumerator" is a list of variables that equate to integer values; for example, GROUNDED = 0, and AIRBORNE = 1.
 enum { # These are possible gameplay states. It will probably become longer later!
 	GROUNDED,
-	AIRBORNE
+	AIRBORNE,
+	DEAD,
+	HURT
 }
 
 var jumped = false; # Variable for determining if coyote time still applies and if downward velocity should be applied when releasing jump
@@ -27,8 +30,16 @@ var coyote_time; # Sets itself to the default when grounded; "coyote time" deter
 var moving_right = true # If velocity.x is positive.
 var just_landed = false # Set to true if player has just landed.
 
+# Pain related variables
+var current_iframes = 0 # take a wild guess what this is for
+var invincible = false # think mark think
+var just_got_hurt = false # for now hehehehehe
+
 @onready var player_sprite = $PlayerSprite # The sprite node.
 @onready var sfx = $PlayerSFX
+
+# Observe player's hurtbox
+@onready var ReceiveDamage = $ReceiveDamage
 
 # When first loaded:
 func _ready():
@@ -40,7 +51,14 @@ func _ready():
 func _physics_process(_delta):
 	$Floored.text = "iof: " + str(is_on_floor()); # Display whether the "is_on_floor()" check returns true
 	$FloorNormal.text = "vel: " + str(velocity); # Display velocity
-
+	$State.text = "State: " + str(state); # Display the Epstein files
+	
+		# Receive damage from enemies
+	if current_iframes <= 0:
+		get_hit()
+	elif invincible == false:
+		current_iframes -= 1
+	
 	# Decide what kind of action the player is doing
 	state_machine(_delta)
 
@@ -63,6 +81,8 @@ func state_machine(_delta):
 			grounded(_delta);
 		AIRBORNE:
 			airborne(_delta);
+		HURT:
+			hurt(_delta);
 
 func grounded(_delta): # Grounded actions
 	# Get player input and do movement
@@ -105,6 +125,16 @@ func airborne(_delta): # Airboren actions
 		jumped = false;
 		coyote_time = coyote_default;
 		just_landed = true # Set for the sake of animation.
+
+func hurt(_delta):
+	if just_got_hurt == true:
+		velocity = Vector2(-100,-100)
+	velocity.y += GRAVITY * GRAVITY_MULT;
+	if is_on_floor() && !just_got_hurt: # If we hit the ground, switch states to GROUNDED and reset some variables. Just got hurt check thing so we do not immediatly go to GROUNDED.
+		state = GROUNDED
+		just_landed = true # Set for the sake of animation.
+	pass
+	just_got_hurt = false
 
 # Does the movement, applying friction as necessary.
 func movement(direction, friction):
@@ -168,3 +198,13 @@ func animation_update():
 		sfx.walk_loop()
 	else:
 		sfx.walk_stop()
+
+func get_hit():
+	if ReceiveDamage.has_overlapping_areas():
+		var areas = ReceiveDamage.get_overlapping_areas()
+		var damage = areas[0].get_parent().DAMAGE
+		health -= damage
+		current_iframes = IFRAMES
+		state = HURT
+		just_got_hurt = true
+		print(health)
