@@ -1,0 +1,18 @@
+[gd_scene load_steps=2 format=3 uid="uid://culmf8vijk0pa"]
+
+[ext_resource type="Texture2D" uid="uid://sion5fa01v42" path="res://Graphics/test_image.jpg" id="1_j1x78"]
+
+[node name="DeathScreen" type="Node2D"]
+
+[node name="TestImage" type="Sprite2D" parent="."]
+position = Vector2(176, 100)
+scale = Vector2(2.1125, 2.1125)
+texture = ExtResource("1_j1x78")
+
+[node name="Label" type="Label" parent="."]
+modulate = Color(0, 0, 0, 1)
+offset_left = 254.0
+offset_top = 149.0
+offset_right = 350.0
+offset_bottom = 200.0
+text = "is lupuse"

@@ -6,6 +6,7 @@ const SCENE_LIBRARY = {
 	"test_map" : "res://Scenes/Maps/test_map.tscn",
 	"map_dungeon_1" : "",
 	"end_credits" : "res://Scenes/Maps/credits_map.tscn",
+	"death_screen": "res://Scenes/Maps/death_screen.tscn"
 }
 
 # The current scene being run by the game.

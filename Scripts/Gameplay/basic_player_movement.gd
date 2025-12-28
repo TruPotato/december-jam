@@ -35,6 +35,8 @@ var current_iframes = 0 # take a wild guess what this is for
 var invincible = false # think mark think
 var just_got_hurt = false # for now hehehehehe
 
+@export var death_screen = "death_screen"
+
 @onready var player_sprite = $PlayerSprite # The sprite node.
 @onready var sfx = $PlayerSFX
 
@@ -58,6 +60,9 @@ func _physics_process(_delta):
 		get_hit()
 	elif invincible == false:
 		current_iframes -= 1
+	
+	if health <= 0:
+		state = DEAD
 	
 	# Decide what kind of action the player is doing
 	state_machine(_delta)
@@ -83,6 +88,8 @@ func state_machine(_delta):
 			airborne(_delta);
 		HURT:
 			hurt(_delta);
+		DEAD:
+			dead(_delta);
 
 func grounded(_delta): # Grounded actions
 	# Get player input and do movement
@@ -127,14 +134,18 @@ func airborne(_delta): # Airboren actions
 		just_landed = true # Set for the sake of animation.
 
 func hurt(_delta):
-	if just_got_hurt == true:
-		velocity = Vector2(-100,-100)
 	velocity.y += GRAVITY * GRAVITY_MULT;
 	if is_on_floor() && !just_got_hurt: # If we hit the ground, switch states to GROUNDED and reset some variables. Just got hurt check thing so we do not immediatly go to GROUNDED.
 		state = GROUNDED
 		just_landed = true # Set for the sake of animation.
 	pass
-	just_got_hurt = false
+	if just_got_hurt == true:
+		velocity = Vector2(-50,-100)
+		just_got_hurt = false
+
+func dead(_delta):
+	Globals.change_scene(death_screen)
+	pass
 
 # Does the movement, applying friction as necessary.
 func movement(direction, friction):
