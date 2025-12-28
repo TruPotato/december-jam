@@ -11,7 +11,8 @@ var alive=true
 @export var hurt_time = 0.4 # How long the enemy staggers for.
 var hurt_timer_delta = 0.0
 
-
+# pain related variables
+var hurt_me = 0
 var current_iframes = 0
 
 enum MOVEMENT_STATE {
@@ -37,7 +38,7 @@ func _ready():
 	floor_snap_length = 3.5; # Stick to slopes
 	floor_constant_speed = true; # Don't slow down on slopes
 	currentHP = INITIAL_HP # reset HP
-	$TakeDamageFromPlayer.connect("body_entered", body_entered_hurtbox) # When a body enters our damage-taking box, run the function body_enetered_hurtbox()
+	#$TakeDamageFromPlayer.connect("body_entered", body_entered_hurtbox) # When a body enters our damage-taking box, run the function body_enetered_hurtbox()
 	if direction == DIRECTIONS.LEFT:
 		enemy_sprite.flip_h = true
 	else:
@@ -48,6 +49,18 @@ func _physics_process(delta: float) -> void:
 	# Add the gravity.
 	if not is_on_floor():
 		velocity += get_gravity() * delta
+	
+	if hurt_me > 0:# The enemy has been damaged normally.
+		currentHP -= hurt_me # Take in the damage
+		if currentHP <= 0: # if dead then die
+			enemy_defeated() # And with strange eons, even death may die...
+		else: 
+			current_iframes = MAX_IFRAMES
+			hurt_me = 0 # Stop receiving additional damage
+			$EnemySprite.play("hurt") # Play hurt animation.
+			$EnemyPlayer.play("hurt_flash")
+			hurt_timer_delta = hurt_time # Set the hurt timer.
+			current_move_state = MOVEMENT_STATE.HURT
 	
 	
 	match current_move_state:
@@ -85,12 +98,14 @@ func movement_wander(_delta):
 			enemy_sprite.flip_h = false
 
 # be hurt by the player
+# TODO: this will currently not trigger because of my new dogshit bounce-on-enemies logic. It should probably be deleted   -Paul
 func body_entered_hurtbox(body):
 	if alive == false or current_iframes > 0: # If we have died or we are invulnerable, don't run the function
 		return
 	
 	if body.name=="PlayerNode" && body.velocity.y>0: # If the entering body is the player and the player is falling onto the enemy
-		body.velocity.y = -200 # Move them away
+		# TODO: spongeboy mebob, this will not work when we implement the fireball dash and I am soon going to die, aaaack ack ack ack ack
+		#body.velocity.y = -120 # Make player bounce up
 		$Hurt.play() # Play our hurt sound
 		currentHP -= body.atk # Subtract the player's attack from our HP
 		current_iframes = MAX_IFRAMES # Fill up our iframes
@@ -103,12 +118,12 @@ func body_entered_hurtbox(body):
 			$EnemyPlayer.play("hurt_flash")
 			hurt_timer_delta = hurt_time # Set the hurt timer.
 			current_move_state = MOVEMENT_STATE.HURT
-		pass
+		#pass
 
 func enemy_defeated():
 	
 	$DamageThePlayer.process_mode = Node.PROCESS_MODE_DISABLED; # Disable the hitboxes.
-	$TakeDamageFromPlayer.process_mode = Node.PROCESS_MODE_DISABLED;
+	$TakeDamageFromPlayer.process_mode = Node.PROCESS_MODE_DISABLED; # ooooooo the debugger does not like this one
 	
 	
 	current_move_state = MOVEMENT_STATE.DEFEATED # Put the enemy in the defeated state..
@@ -116,7 +131,7 @@ func enemy_defeated():
 	$EnemySprite.play("hurt") # Play our hurt animation
 	$EnemyPlayer.play("defeat_animation") # Play our death flickering
 	await $EnemyPlayer.animation_finished # Wait until that's over
-	$Burst.play()
+	$Burst.play() # sound effect :3
 	# Release the star particles.
 	for star in $StarParticles.get_children(): # Explode particles out by looping over them and activating them
 		star.show()

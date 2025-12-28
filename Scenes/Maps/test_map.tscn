@@ -134,4 +134,7 @@ position = Vector2(215, 477)
 [node name="Enemy2" parent="." instance=ExtResource("1_o1aaj")]
 position = Vector2(17, 380)
 
+[node name="Enemy3" parent="." instance=ExtResource("1_o1aaj")]
+position = Vector2(-1, 374)
+
 [connection signal="body_entered" from="TemporaryDoor" to="TemporaryDoor" method="_on_body_entered"]

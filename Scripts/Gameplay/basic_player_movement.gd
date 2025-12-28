@@ -9,6 +9,7 @@ const AIR_FRICTION = 18 * PIXEL_SCALE; # Friction in the air (determines how muc
 const GROUND_FRICTION = 30 * PIXEL_SCALE; # Friction on the ground (same as AIR_FRICTION but for the ground)
 const JUMP_VELOCITY = 500.0 * PIXEL_SCALE # Code says jump, this says how high
 const IFRAMES = 1 # invincibility frames
+const DEFAULT_STOMP_BOUNCE = -120 # what will the player's velocity.v be set to when stomping an enemy without pressing jump? this.
 
 # An "enum" or "Enumerator" is a list of variables that equate to integer values; for example, GROUNDED = 0, and AIRBORNE = 1.
 enum { # These are possible gameplay states. It will probably become longer later!
@@ -35,7 +36,7 @@ var moving_right = true # If velocity.x is positive.
 var just_landed = false # Set to true if player has just landed.
 
 # Pain related variables
-var last_enemy
+var last_enemy # Helps us determine where we are getting hit from, relative position to enemy, so we can knockback in the correct direction
 var current_iframes = 0 # take a wild guess what this is for
 var invincible = false # think mark think
 var just_got_hurt = false # for now hehehehehe
@@ -48,6 +49,9 @@ var just_got_hurt = false # for now hehehehehe
 
 # Observe player's hurtbox
 @onready var ReceiveDamage = $ReceiveDamage
+
+# Observe the player's... stompbox? I don't wanna call it a hitbox that is ambiguousas fuck.
+@onready var JumpHit = $JumpHit
 
 # When first loaded:
 func _ready():
@@ -113,6 +117,9 @@ func grounded(_delta): # Grounded actions
 func airborne(_delta): # Airboren actions
 	# Get player input and do movement
 	movement(get_directional_input(), AIR_FRICTION);
+	
+	# Check if we are stomping an enemy and act accordingly if so
+	stomp()
 
 	# Apply gravity. If velocity is lower than zero, just apply it normally; otherwise add a multiplier to make for a nicer jump arc.
 	if velocity.y < 0:
@@ -146,12 +153,12 @@ func hurt(_delta):
 	if is_on_floor() && !just_got_hurt: # If we hit the ground, switch states to GROUNDED and reset some variables. Just got hurt check thing so we do not immediatly go to GROUNDED.
 		state = GROUNDED
 		just_landed = true # Set for the sake of animation.
-	pass
+	#pass <- why the hell was there a pass here? I have disabled it, everything seems to still work fine
 	if just_got_hurt == true:
-		var lupuse = 1
+		var knockback_direction = 1 # right
 		if position.x < last_enemy.position.x:
-			lupuse = -1
-		velocity = Vector2(50*lupuse,-100)
+			knockback_direction = -1 # left
+		velocity = Vector2(50*knockback_direction,-100) #knock player up and away from the damage source
 		just_got_hurt = false
 
 func dead(_delta):
@@ -174,9 +181,6 @@ func jump():
 	# i doubt this will get more complex than this but just in case i am making it a function so i don't have repeat code
 	velocity.y = -JUMP_VELOCITY;
 	sfx.play_sfx(sfx.JUMP)
-
-func die():
-	pass # TODO: die
 
 # Update the player's sprite.
 func animation_update():
@@ -233,3 +237,22 @@ func get_hit():
 		just_got_hurt = true
 		last_enemy = enemy
 		print(health)
+
+func stomp():
+	if velocity.y >0: # We should not be able to stomp, say, on our way up.
+		if JumpHit.get_overlapping_areas(): # are we even stomping anything
+			var areas = JumpHit.get_overlapping_areas() # okay who are we stomping
+			var victim = areas[0].get_parent() # let's only stomp 1 enemy at once mmmkay? whichever one godot says is [0]
+			victim.hurt_me = atk # tell the enemy to SUFFER (when its their turn to run their code)
+			# TODO: Hey, Paul, why do this whole hurt_me charade instead of just reducing the enemy's HP?
+			# Because I want the enemy to be aware that they got hurt and hurt_me being > 0 is a nice way of doing that.
+			# Although we probably have a "just_got_hurt" or some shit I could use instead
+			# But that's polish that can wait
+			atk += 1 # reward combos with extra damage
+	
+		# Allow the player to control how high they bounce off of enemies when attacking them (works like jumping as if off of ground)
+		if Input.is_action_pressed("jump") && JumpHit.has_overlapping_areas(): # the player is actively trying to jump off of enemies. No "just_pressed", player can just hold, it's okayyyyy
+			jump() # Yeah this works wonders right off the bat
+			jumped = false # I think this is necessary but I honestly haven't even checked
+		elif JumpHit.has_overlapping_areas(): # the player is not pressing jump, apply minimum bounce
+			velocity.y = DEFAULT_STOMP_BOUNCE
