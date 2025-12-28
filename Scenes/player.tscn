@@ -3,7 +3,7 @@
 [ext_resource type="Script" uid="uid://cnccg6pbdd32d" path="res://Scripts/Gameplay/basic_player_movement.gd" id="1_v0iea"]
 [ext_resource type="Texture2D" uid="uid://b78l5uba8tn3e" path="res://Graphics/skele1.png" id="2_cvnsp"]
 [ext_resource type="FontFile" uid="uid://c4uwm7m7pvmig" path="res://Graphics/POCKETPIXELREGULAR.TTF" id="3_6t5aa"]
-[ext_resource type="Script" path="res://Scripts/Gameplay/player_sprite_animation.gd" id="3_vgqql"]
+[ext_resource type="Script" uid="uid://cm32rq6q28bvf" path="res://Scripts/Gameplay/player_sprite_animation.gd" id="3_vgqql"]
 [ext_resource type="Script" uid="uid://7y4ey27kdad2" path="res://Scripts/Sound/player_sfx.gd" id="5_fkybt"]
 [ext_resource type="AudioStream" uid="uid://blrgwr3lgrooi" path="res://Audio/jump.wav" id="6_x3wgy"]
 [ext_resource type="AudioStream" uid="uid://pymr4c5hnxo" path="res://Audio/step.wav" id="7_3smsa"]

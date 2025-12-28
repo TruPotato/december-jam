@@ -84,11 +84,12 @@ func movement_wander(_delta):
 		else:
 			enemy_sprite.flip_h = false
 
+# be hurt by the player
 func body_entered_hurtbox(body):
 	if alive == false or current_iframes > 0: # If we have died or we are invulnerable, don't run the function
 		return
 	
-	if body.name=="PlayerNode": # If the entering body is the player
+	if body.name=="PlayerNode" && body.velocity.y>0: # If the entering body is the player and the player is falling onto the enemy
 		body.velocity.y = -200 # Move them away
 		$Hurt.play() # Play our hurt sound
 		currentHP -= body.atk # Subtract the player's attack from our HP
