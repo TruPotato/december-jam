@@ -10,6 +10,7 @@
 script/source = "extends CharacterBody2D
 
 var alive = true
+var hurt_me = 0 # stomping a turty requires that the turty has a hurt_me variable or else stomp() will crash godot
 
 func _ready():
 	$Hurtbox.connect(\"body_entered\", body_entered_hurtbox)

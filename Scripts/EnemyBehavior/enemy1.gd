@@ -31,7 +31,7 @@ enum DIRECTIONS {
 	LEFT = -1,
 	RIGHT = 1
 }
-@export var direction: DIRECTIONS # the direction that dr houser wants to move in, will flip between left and right when he collides with a wall. 1=right -1=left
+@export var direction: DIRECTIONS # desired movement direction
 @onready var enemy_sprite = $EnemySprite
 
 func _ready():
@@ -50,6 +50,11 @@ func _physics_process(delta: float) -> void:
 	if not is_on_floor():
 		velocity += get_gravity() * delta
 	
+	# Reenable hitboxes once the enemy is done being stunned
+	if current_iframes <= 0:
+		$DamageThePlayer.process_mode = Node.PROCESS_MODE_PAUSABLE
+		$TakeDamageFromPlayer.process_mode = Node.PROCESS_MODE_PAUSABLE
+	
 	if hurt_me > 0:# The enemy has been damaged normally.
 		currentHP -= hurt_me # Take in the damage
 		if currentHP <= 0: # if dead then die
@@ -61,6 +66,8 @@ func _physics_process(delta: float) -> void:
 			$EnemyPlayer.play("hurt_flash")
 			hurt_timer_delta = hurt_time # Set the hurt timer.
 			current_move_state = MOVEMENT_STATE.HURT
+			$DamageThePlayer.process_mode = Node.PROCESS_MODE_DISABLED
+			$TakeDamageFromPlayer.process_mode = Node.PROCESS_MODE_DISABLED 
 	
 	
 	match current_move_state:
@@ -98,27 +105,27 @@ func movement_wander(_delta):
 			enemy_sprite.flip_h = false
 
 # be hurt by the player
-# TODO: this will currently not trigger because of my new dogshit bounce-on-enemies logic. It should probably be deleted   -Paul
-func body_entered_hurtbox(body):
-	if alive == false or current_iframes > 0: # If we have died or we are invulnerable, don't run the function
-		return
-	
-	if body.name=="PlayerNode" && body.velocity.y>0: # If the entering body is the player and the player is falling onto the enemy
-		# TODO: spongeboy mebob, this will not work when we implement the fireball dash and I am soon going to die, aaaack ack ack ack ack
-		#body.velocity.y = -120 # Make player bounce up
-		$Hurt.play() # Play our hurt sound
-		currentHP -= body.atk # Subtract the player's attack from our HP
-		current_iframes = MAX_IFRAMES # Fill up our iframes
-		
-		if currentHP <= 0: # if dead then die
-			enemy_defeated() # And with strange eons, even death may die...
-		else: 
-			# The enemy has been damaged normally.
-			$EnemySprite.play("hurt") # Play hurt animation.
-			$EnemyPlayer.play("hurt_flash")
-			hurt_timer_delta = hurt_time # Set the hurt timer.
-			current_move_state = MOVEMENT_STATE.HURT
-		#pass
+# TODO: this will currently not trigger because of my new bounce-on-enemies logic. It should probably be deleted   -Paul
+#func body_entered_hurtbox(body):
+#	if alive == false or current_iframes > 0: # If we have died or we are invulnerable, don't run the function
+#		return
+#	
+#	if body.name=="PlayerNode" && body.velocity.y>0: # If the entering body is the player and the player is falling onto the enemy
+#		# TODO: spongeboy mebob, this will not work when we implement the fireball dash and I am soon going to die, aaaack ack ack ack ack
+#		#body.velocity.y = -120 # Make player bounce up
+#		$Hurt.play() # Play our hurt sound
+#		currentHP -= body.atk # Subtract the player's attack from our HP
+#		current_iframes = MAX_IFRAMES # Fill up our iframes
+#		
+#		if currentHP <= 0: # if dead then die
+#			enemy_defeated() # And with strange eons, even death may die...
+#		else: 
+#			# The enemy has been damaged normally.
+#			$EnemySprite.play("hurt") # Play hurt animation.
+#			$EnemyPlayer.play("hurt_flash")
+#			hurt_timer_delta = hurt_time # Set the hurt timer.
+#			current_move_state = MOVEMENT_STATE.HURT
+#		#pass
 
 func enemy_defeated():
 	

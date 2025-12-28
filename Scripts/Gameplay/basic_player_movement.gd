@@ -16,11 +16,20 @@ enum { # These are possible gameplay states. It will probably become longer late
 	GROUNDED,
 	AIRBORNE,
 	DEAD,
-	HURT
+	HURT,
+	GROUNDPOUNDING
 }
 
-var base_atk = 1
-var atk = 1
+# skills
+var ground_pound = true
+var fire_dash    = true
+var parry        = true
+var thruster     = true
+
+# violence :D
+var base_atk    = 1 # variable in case we want there to be upgrades
+var maximum_atk = 3 # variable in case we want there to be upgrades
+var atk = 1 # this is the damage we will actually deal
 
 var jumped = false; # Variable for determining if coyote time still applies and if downward velocity should be applied when releasing jump
 var state = GROUNDED; # Sets the default state to GROUNDED or 0.
@@ -100,6 +109,8 @@ func state_machine(_delta):
 			hurt(_delta);
 		DEAD:
 			dead(_delta);
+		GROUNDPOUNDING:
+			groundpounding(_delta);
 
 func grounded(_delta): # Grounded actions
 	# Get player input and do movement
@@ -120,7 +131,11 @@ func airborne(_delta): # Airboren actions
 	
 	# Check if we are stomping an enemy and act accordingly if so
 	stomp()
-
+	
+	# Use ground pound
+	if Input.is_action_pressed("move_down") && Input.is_action_just_pressed("jump"): # if we jump while holding down
+		state = GROUNDPOUNDING # will not actually groundpound until next physics step. I think. That sounds bad.
+	
 	# Apply gravity. If velocity is lower than zero, just apply it normally; otherwise add a multiplier to make for a nicer jump arc.
 	if velocity.y < 0:
 		velocity.y += GRAVITY;
@@ -163,6 +178,19 @@ func hurt(_delta):
 
 func dead(_delta):
 	Globals.change_scene(death_screen)
+	pass
+
+func groundpounding(_delta):
+	velocity.x = 0
+	velocity.y = 300
+	# Check if we are stomping an enemy and act accordingly if so
+	stomp()
+	# Down here same as in airborne
+	if is_on_floor(): # If we hit the ground, switch states to GROUNDED and reset some variables.
+		state = GROUNDED
+		jumped = false;
+		coyote_time = coyote_default;
+		just_landed = true # Set for the sake of animation.
 	pass
 
 # Does the movement, applying friction as necessary.
@@ -244,11 +272,15 @@ func stomp():
 			var areas = JumpHit.get_overlapping_areas() # okay who are we stomping
 			var victim = areas[0].get_parent() # let's only stomp 1 enemy at once mmmkay? whichever one godot says is [0]
 			victim.hurt_me = atk # tell the enemy to SUFFER (when its their turn to run their code)
-			# TODO: Hey, Paul, why do this whole hurt_me charade instead of just reducing the enemy's HP?
+			# Hey, Paul, why do this whole hurt_me charade instead of just reducing the enemy's HP?
 			# Because I want the enemy to be aware that they got hurt and hurt_me being > 0 is a nice way of doing that.
-			# Although we probably have a "just_got_hurt" or some shit I could use instead
-			# But that's polish that can wait
+			# Alternatively we could give the enemies a just_got_hurt bool
 			atk += 1 # reward combos with extra damage
+			if atk > maximum_atk:
+				atk = maximum_atk
+			# Let the groundpound deal x2 damage, even if it exceeds the cap. The way I did it smells like it will brek if we stom through multiple enemies but oh well.
+			if state == GROUNDPOUNDING:
+				atk = 1
 	
 		# Allow the player to control how high they bounce off of enemies when attacking them (works like jumping as if off of ground)
 		if Input.is_action_pressed("jump") && JumpHit.has_overlapping_areas(): # the player is actively trying to jump off of enemies. No "just_pressed", player can just hold, it's okayyyyy
