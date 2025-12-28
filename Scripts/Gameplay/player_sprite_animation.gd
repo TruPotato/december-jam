@@ -10,7 +10,7 @@ enum STATES { # The animation states.
 
 var current_state = STATES.IDLE
 
-const LAND_TIME = 0.03 # How long the land animation lasts.
+const LAND_TIME = 0.1 # How long the land animation lasts.
 var land_timer = 0.0
 
 

@@ -138,7 +138,10 @@ func enemy_defeated():
 	$EnemySprite.play("hurt") # Play our hurt animation
 	$EnemyPlayer.play("defeat_animation") # Play our death flickering
 	await $EnemyPlayer.animation_finished # Wait until that's over
+<<<<<<< Updated upstream
 	$Burst.play() # sound effect :3
+=======
+>>>>>>> Stashed changes
 	# Release the star particles.
 	for star in $StarParticles.get_children(): # Explode particles out by looping over them and activating them
 		star.show()
