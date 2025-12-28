@@ -1,8 +1,32 @@
-
+checkmark for copying and pasting ✓
 
 THINGS TO DO:
 	- ✓ player movement calculations and feel
-	-   basic enemy code
-	-   health
-	-   lose condition
-	
+	- ✓ basic enemy code
+	- ✓ health
+	- ✓ lose condition
+
+	-   health display
+	-   polished death state for player
+
+	-   carrying states
+		-   airborne
+		-   grounded
+
+	-   abilities
+		-   ground pound
+		-   fireball
+		-   parry
+		-   alchemical thruster
+	-   escape timer
+
+	-   more enemies
+		-   projectile enemy
+			-   static shooter
+			-   more complex projectile enemy?
+		-   jumping enemy?
+		-   more ideas if we have time
+
+	-   dialog?
+	-   shop?
+		-   using health as currency?
