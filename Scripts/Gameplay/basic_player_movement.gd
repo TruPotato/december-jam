@@ -8,7 +8,7 @@ const H_SPEED = 200.0 * PIXEL_SCALE # Base horizontal speed
 const AIR_FRICTION = 18 * PIXEL_SCALE; # Friction in the air (determines how much control you have while airborne)
 const GROUND_FRICTION = 30 * PIXEL_SCALE; # Friction on the ground (same as AIR_FRICTION but for the ground)
 const JUMP_VELOCITY = 500.0 * PIXEL_SCALE # Code says jump, this says how high
-const IFRAMES = 60 # invincibility frames
+const IFRAMES = 1 # invincibility frames
 
 # An "enum" or "Enumerator" is a list of variables that equate to integer values; for example, GROUNDED = 0, and AIRBORNE = 1.
 enum { # These are possible gameplay states. It will probably become longer later!
@@ -17,6 +17,9 @@ enum { # These are possible gameplay states. It will probably become longer late
 	DEAD,
 	HURT
 }
+
+var base_atk = 1
+var atk = 1
 
 var jumped = false; # Variable for determining if coyote time still applies and if downward velocity should be applied when releasing jump
 var state = GROUNDED; # Sets the default state to GROUNDED or 0.
@@ -31,6 +34,7 @@ var moving_right = true # If velocity.x is positive.
 var just_landed = false # Set to true if player has just landed.
 
 # Pain related variables
+var last_enemy
 var current_iframes = 0 # take a wild guess what this is for
 var invincible = false # think mark think
 var just_got_hurt = false # for now hehehehehe
@@ -50,7 +54,7 @@ func _ready():
 	floor_constant_speed = true; # Disables moving slowly when going up slopes. We can change this later.
 
 # The main loop.
-func _physics_process(_delta):
+func _physics_process(delta):
 	$Floored.text = "iof: " + str(is_on_floor()); # Display whether the "is_on_floor()" check returns true
 	$FloorNormal.text = "vel: " + str(velocity); # Display velocity
 	$State.text = "State: " + str(state); # Display the Epstein files
@@ -59,13 +63,13 @@ func _physics_process(_delta):
 	if current_iframes <= 0:
 		get_hit()
 	elif invincible == false:
-		current_iframes -= 1
+		current_iframes -= 1*delta
 	
 	if health <= 0:
 		state = DEAD
 	
 	# Decide what kind of action the player is doing
-	state_machine(_delta)
+	state_machine(delta)
 
 	# Apply physics and move.
 	move_and_slide()
@@ -94,7 +98,9 @@ func state_machine(_delta):
 func grounded(_delta): # Grounded actions
 	# Get player input and do movement
 	movement(get_directional_input(), GROUND_FRICTION)
-
+	
+	atk = base_atk
+	
 	if Input.is_action_just_pressed("jump"): # If the player pressed the jump button...
 		# ...jump.
 		jump();
@@ -140,7 +146,10 @@ func hurt(_delta):
 		just_landed = true # Set for the sake of animation.
 	pass
 	if just_got_hurt == true:
-		velocity = Vector2(-50,-100)
+		var lupuse = 1
+		if position.x < last_enemy.position.x:
+			lupuse = -1
+		velocity = Vector2(50*lupuse,-100)
 		just_got_hurt = false
 
 func dead(_delta):
@@ -213,9 +222,10 @@ func animation_update():
 func get_hit():
 	if ReceiveDamage.has_overlapping_areas():
 		var areas = ReceiveDamage.get_overlapping_areas()
-		var damage = areas[0].get_parent().DAMAGE
-		health -= damage
+		var enemy = areas[0].get_parent()
+		health -= enemy.DAMAGE
 		current_iframes = IFRAMES
 		state = HURT
 		just_got_hurt = true
+		last_enemy = enemy
 		print(health)

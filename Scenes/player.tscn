@@ -175,6 +175,8 @@ text = "TEST"
 label_settings = SubResource("LabelSettings_vgqql")
 
 [node name="JumpHit" type="Area2D" parent="."]
+collision_layer = 2
+collision_mask = 2
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="JumpHit"]
 position = Vector2(0, -2)
