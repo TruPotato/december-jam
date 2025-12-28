@@ -197,7 +197,7 @@ func animation_update():
 	match state:
 		GROUNDED:
 			# Player is on the ground.
-			if velocity.x == 0.0:
+			if abs(velocity.x) < 15.0:
 				# Player is still.
 				player_sprite.change_animation_state(player_sprite.STATES.IDLE)
 			else:

@@ -1,8 +1,11 @@
-[gd_scene load_steps=10 format=3 uid="uid://d145sysh30f4t"]
+[gd_scene load_steps=14 format=3 uid="uid://d145sysh30f4t"]
 
 [ext_resource type="Script" uid="uid://222xg40eadre" path="res://Scripts/Visuals/star_particle.gd" id="1_glr6h"]
 [ext_resource type="Texture2D" uid="uid://b8hx430twgqr4" path="res://Graphics/star_particles.png" id="1_pl465"]
-[ext_resource type="AudioStream" uid="uid://fm4wq38xueox" path="res://Audio/star_bounce.wav" id="3_lhe6y"]
+[ext_resource type="AudioStream" uid="uid://ioxsuvvrdfax" path="res://Audio/blink1.wav" id="3_fu4kt"]
+[ext_resource type="AudioStream" uid="uid://gpkc68tegdgl" path="res://Audio/blink2.wav" id="4_t77bc"]
+[ext_resource type="AudioStream" uid="uid://cqxwbweg1xhmj" path="res://Audio/blink3.wav" id="5_j4lg0"]
+[ext_resource type="AudioStream" uid="uid://cxqhvtgys8lpg" path="res://Audio/blink4.wav" id="6_csttt"]
 
 [sub_resource type="PhysicsMaterial" id="PhysicsMaterial_eh6rn"]
 friction = 0.3
@@ -40,6 +43,13 @@ animations = [{
 "speed": 6.0
 }]
 
+[sub_resource type="AudioStreamRandomizer" id="AudioStreamRandomizer_lhe6y"]
+streams_count = 4
+stream_0/stream = ExtResource("3_fu4kt")
+stream_1/stream = ExtResource("4_t77bc")
+stream_2/stream = ExtResource("5_j4lg0")
+stream_3/stream = ExtResource("6_csttt")
+
 [node name="StarParticle" type="RigidBody2D"]
 top_level = true
 collision_layer = 0
@@ -61,6 +71,7 @@ frame_progress = 0.49383882
 offset = Vector2(0, -4)
 
 [node name="Blink" type="AudioStreamPlayer" parent="."]
-stream = ExtResource("3_lhe6y")
-volume_db = -2.0
+stream = SubResource("AudioStreamRandomizer_lhe6y")
+volume_db = -6.0
+pitch_scale = 1.1
 bus = &"SFX"

@@ -1,11 +1,50 @@
 [gd_scene load_steps=17 format=3 uid="uid://gnxm0jmfcopl"]
 
-[ext_resource type="Script" uid="uid://cclfugaart0h0" path="res://Scripts/Gameplay/basic_enemy.gd" id="1_prowa"]
 [ext_resource type="Texture2D" uid="uid://by31hobmanf0x" path="res://Graphics/kobo1.png" id="2_cjj88"]
 [ext_resource type="Shader" uid="uid://dk86wcgh17nm7" path="res://Scripts/Shaders/colour_blocking.gdshader" id="2_eh6rn"]
 [ext_resource type="AudioStream" uid="uid://cisu8w5we0bky" path="res://Audio/enemy_boom.wav" id="3_1rhlf"]
 [ext_resource type="AudioStream" uid="uid://bgacnwrtryurg" path="res://Audio/enemy_hit.wav" id="3_eh6rn"]
 [ext_resource type="PackedScene" uid="uid://d145sysh30f4t" path="res://Scenes/Reusables/star_particle.tscn" id="6_1rhlf"]
+
+[sub_resource type="GDScript" id="GDScript_eh6rn"]
+script/source = "extends CharacterBody2D
+
+var alive = true
+
+func _ready():
+	$Hurtbox.connect(\"body_entered\", body_entered_hurtbox)
+
+func body_entered_hurtbox(body):
+	if alive == false:
+		return
+	
+	if body.name == \"PlayerNode\":
+		# Stomped on.
+		# Add a burst of energy for the player.
+		body.velocity.y = -200.0
+		$Hurt.play()
+		# Health mechanics will be added later. For now, one stomp is enough.
+		enemy_defeated()
+
+func enemy_defeated():
+	alive = false
+	$EnemySprite.play(\"hurt\")
+	$EnemyPlayer.play(\"defeat_animation\")
+	await $EnemyPlayer.animation_finished
+	# Release the star particles.
+	for star in $StarParticles.get_children():
+		star.show()
+		star.position = position
+		star.freeze = false
+		var random_vel = Vector2.ZERO
+		random_vel.x = randf_range(-100.0, 100.0)
+		random_vel.y = randf_range(-160.0, -170.0)
+		star.apply_impulse(random_vel)
+		star.activate()
+	await get_tree().create_timer(10.0).timeout
+	hide()
+	queue_free()
+"
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_8y5mx"]
 size = Vector2(15, 2.5)
@@ -193,7 +232,7 @@ animations = [{
 
 [node name="BasicEnemy" type="CharacterBody2D"]
 collision_layer = 0
-script = ExtResource("1_prowa")
+script = SubResource("GDScript_eh6rn")
 
 [node name="Hurtbox" type="Area2D" parent="."]
 collision_layer = 2

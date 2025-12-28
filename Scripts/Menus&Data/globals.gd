@@ -12,6 +12,8 @@ const SCENE_LIBRARY = {
 # The current scene being run by the game.
 var current_scene
 
+var debug_mode = true # Disabling this turns off things like the debug labels and etc.
+
 # Upon launching the game.
 func _ready():
 	determine_current_scene()

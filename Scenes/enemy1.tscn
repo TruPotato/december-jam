@@ -1,50 +1,12 @@
-[gd_scene load_steps=19 format=3 uid="uid://c6go8vbjw73tu"]
+[gd_scene load_steps=25 format=3 uid="uid://c6go8vbjw73tu"]
 
 [ext_resource type="Script" uid="uid://bljlp744ixbsg" path="res://Scripts/EnemyBehavior/enemy1.gd" id="1_r5e6g"]
 [ext_resource type="Shader" uid="uid://dk86wcgh17nm7" path="res://Scripts/Shaders/colour_blocking.gdshader" id="2_ite14"]
 [ext_resource type="Texture2D" uid="uid://by31hobmanf0x" path="res://Graphics/kobo1.png" id="2_r5e6g"]
 [ext_resource type="AudioStream" uid="uid://cisu8w5we0bky" path="res://Audio/enemy_boom.wav" id="3_tq1cn"]
 [ext_resource type="AudioStream" uid="uid://bgacnwrtryurg" path="res://Audio/enemy_hit.wav" id="5_2m8t8"]
+[ext_resource type="AudioStream" uid="uid://c8ifdt3me55vc" path="res://Audio/star_burst.wav" id="5_tq1cn"]
 [ext_resource type="PackedScene" uid="uid://d145sysh30f4t" path="res://Scenes/Reusables/star_particle.tscn" id="6_pjoma"]
-
-[sub_resource type="Animation" id="Animation_v54tr"]
-resource_name = "reset"
-tracks/0/type = "value"
-tracks/0/imported = false
-tracks/0/enabled = true
-tracks/0/path = NodePath("EnemySprite:visible")
-tracks/0/interp = 1
-tracks/0/loop_wrap = true
-tracks/0/keys = {
-"times": PackedFloat32Array(0),
-"transitions": PackedFloat32Array(1),
-"update": 1,
-"values": [true]
-}
-tracks/1/type = "value"
-tracks/1/imported = false
-tracks/1/enabled = true
-tracks/1/path = NodePath("EnemySprite:material")
-tracks/1/interp = 1
-tracks/1/loop_wrap = true
-tracks/1/keys = {
-"times": PackedFloat32Array(0),
-"transitions": PackedFloat32Array(1),
-"update": 1,
-"values": [null]
-}
-tracks/2/type = "value"
-tracks/2/imported = false
-tracks/2/enabled = true
-tracks/2/path = NodePath("Defeat:playing")
-tracks/2/interp = 1
-tracks/2/loop_wrap = true
-tracks/2/keys = {
-"times": PackedFloat32Array(0),
-"transitions": PackedFloat32Array(1),
-"update": 1,
-"values": [false]
-}
 
 [sub_resource type="Animation" id="Animation_ite14"]
 length = 0.001
@@ -177,11 +139,82 @@ tracks/4/keys = {
 "update": 1,
 "values": [true]
 }
+tracks/5/type = "method"
+tracks/5/imported = false
+tracks/5/enabled = true
+tracks/5/path = NodePath("Burst")
+tracks/5/interp = 1
+tracks/5/loop_wrap = true
+tracks/5/keys = {
+"times": PackedFloat32Array(0.65),
+"transitions": PackedFloat32Array(1),
+"values": [{
+"args": [0.0],
+"method": &"play"
+}]
+}
+
+[sub_resource type="Animation" id="Animation_v54tr"]
+resource_name = "reset"
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("EnemySprite:visible")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [true]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("EnemySprite:material")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [null]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("Defeat:playing")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [false]
+}
+
+[sub_resource type="Animation" id="Animation_tq1cn"]
+resource_name = "hurt_flash"
+length = 0.3
+step = 0.05
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("EnemySprite:visible")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.05, 0.1, 0.2, 0.3),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1),
+"update": 1,
+"values": [false, true, true, false, true]
+}
 
 [sub_resource type="AnimationLibrary" id="AnimationLibrary_pjoma"]
 _data = {
 &"RESET": SubResource("Animation_ite14"),
 &"defeat_animation": SubResource("Animation_2m8t8"),
+&"hurt_flash": SubResource("Animation_tq1cn"),
 &"reset": SubResource("Animation_v54tr")
 }
 
@@ -196,6 +229,22 @@ region = Rect2(0, 0, 24, 24)
 [sub_resource type="AtlasTexture" id="AtlasTexture_f4dah"]
 atlas = ExtResource("2_r5e6g")
 region = Rect2(24, 0, 24, 24)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_ite14"]
+atlas = ExtResource("2_r5e6g")
+region = Rect2(0, 24, 24, 24)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_tq1cn"]
+atlas = ExtResource("2_r5e6g")
+region = Rect2(24, 24, 24, 24)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_2m8t8"]
+atlas = ExtResource("2_r5e6g")
+region = Rect2(48, 24, 24, 24)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_pjoma"]
+atlas = ExtResource("2_r5e6g")
+region = Rect2(72, 24, 24, 24)
 
 [sub_resource type="SpriteFrames" id="SpriteFrames_r5faq"]
 animations = [{
@@ -217,6 +266,23 @@ animations = [{
 "loop": true,
 "name": &"idle",
 "speed": 4.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_ite14")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_tq1cn")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_2m8t8")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_pjoma")
+}],
+"loop": true,
+"name": &"walk",
+"speed": 5.0
 }]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_r5e6g"]
@@ -231,6 +297,8 @@ size = Vector2(12, 12)
 [node name="Enemy1" type="CharacterBody2D"]
 collision_layer = 0
 script = ExtResource("1_r5e6g")
+default_move_state = 1
+direction = -1
 
 [node name="EnemyPlayer" type="AnimationPlayer" parent="."]
 libraries = {
@@ -240,14 +308,20 @@ autoplay = "reset"
 
 [node name="EnemySprite" type="AnimatedSprite2D" parent="."]
 sprite_frames = SubResource("SpriteFrames_r5faq")
-animation = &"idle"
+animation = &"walk"
 autoplay = "idle"
+frame_progress = 0.729437
 offset = Vector2(0, -12)
 flip_h = true
 
 [node name="Hurt" type="AudioStreamPlayer" parent="."]
 stream = ExtResource("5_2m8t8")
 volume_db = -5.0
+bus = &"SFX"
+
+[node name="Burst" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("5_tq1cn")
+volume_db = -2.0
 bus = &"SFX"
 
 [node name="Defeat" type="AudioStreamPlayer" parent="."]
@@ -258,14 +332,17 @@ bus = &"SFX"
 
 [node name="StarParticle" parent="StarParticles" instance=ExtResource("6_pjoma")]
 visible = false
+z_index = -1
 freeze = true
 
 [node name="StarParticle2" parent="StarParticles" instance=ExtResource("6_pjoma")]
 visible = false
+z_index = -1
 freeze = true
 
 [node name="StarParticle3" parent="StarParticles" instance=ExtResource("6_pjoma")]
 visible = false
+z_index = -1
 freeze = true
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]

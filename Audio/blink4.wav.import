@@ -2,13 +2,13 @@
 
 importer="wav"
 type="AudioStreamWAV"
-uid="uid://d30lk8u8ns34j"
-path="res://.godot/imported/enemy_burst.wav-5a50b60d460a631e40866a91de57dd70.sample"
+uid="uid://cxqhvtgys8lpg"
+path="res://.godot/imported/blink4.wav-40c7e955480bd5bf9fbbdfc6705a35b3.sample"
 
 [deps]
 
-source_file="res://Audio/enemy_burst.wav"
-dest_files=["res://.godot/imported/enemy_burst.wav-5a50b60d460a631e40866a91de57dd70.sample"]
+source_file="res://Audio/blink4.wav"
+dest_files=["res://.godot/imported/blink4.wav-40c7e955480bd5bf9fbbdfc6705a35b3.sample"]
 
 [params]
 
