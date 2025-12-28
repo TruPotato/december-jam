@@ -6,7 +6,7 @@ THINGS TO DO:
 	- ✓ health
 	- ✓ lose condition
 
-	-   health display
+	- ✓ health display
 	-   polished death state for player
 
 	-   carrying states
