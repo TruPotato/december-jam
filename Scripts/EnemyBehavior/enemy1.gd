@@ -13,10 +13,10 @@ var current_iframes = 0
 var direction = -1 # the direction that dr houser wants to move in, will flip between left and right when he collides with a wall. 1=right -1=left
 
 func _ready():
-	floor_snap_length = 3.5;
-	floor_constant_speed = true;
-	currentHP = INITIAL_HP
-	$TakeDamageFromPlayer.connect("body_entered", body_entered_hurtbox)
+	floor_snap_length = 3.5; # Stick to slopes
+	floor_constant_speed = true; # Don't slow down on slopes
+	currentHP = INITIAL_HP # reset HP
+	$TakeDamageFromPlayer.connect("body_entered", body_entered_hurtbox) # When a body enters our damage-taking box, run the function body_enetered_hurtbox()
 
 func _physics_process(delta: float) -> void:
 	# Add the gravity.
@@ -30,28 +30,28 @@ func _physics_process(delta: float) -> void:
 		direction *= -1
 	
 	current_iframes -= 10*delta
-	
-	if currentHP <= 0:
-		enemy_defeated()
 
 func body_entered_hurtbox(body):
-	if alive == false or current_iframes > 0:
+	if alive == false or current_iframes > 0: # If we have died or we are invulnerable, don't run the function
 		return
 	
-	if body.name=="PlayerNode":
-		body.velocity.y = -200
-		$Hurt.play()
-		currentHP -= body.atk
-		current_iframes = MAX_IFRAMES
+	if body.name=="PlayerNode": # If the entering body is the player
+		body.velocity.y = -200 # Move them away
+		$Hurt.play() # Play our hurt sound
+		currentHP -= body.atk # Subtract the player's attack from our HP
+		current_iframes = MAX_IFRAMES # Fill up our iframes
+	
+	if currentHP <= 0: # if dead then die
+		enemy_defeated() # And with strange eons, even death may die...
 	pass
 
 func enemy_defeated():
-	alive = false
-	$EnemySprite.play("hurt")
-	$EnemyPlayer.play("defeat_animation")
-	await $EnemyPlayer.animation_finished
+	alive = false # KILL
+	$EnemySprite.play("hurt") # Play our hurt animation (TODO: Make this happen when we take damage too)
+	$EnemyPlayer.play("defeat_animation") # Play our death flickering
+	await $EnemyPlayer.animation_finished # Wait until that's over
 	# Release the star particles.
-	for star in $StarParticles.get_children():
+	for star in $StarParticles.get_children(): # Explode particles out by looping over them and activating them
 		star.show()
 		star.position = position
 		star.freeze = false
@@ -60,8 +60,9 @@ func enemy_defeated():
 		random_vel.y = randf_range(-160.0, -170.0)
 		star.apply_impulse(random_vel)
 		star.activate()
-	await get_tree().create_timer(10.0).timeout
-	hide()
-	queue_free()
+	
+	$DamageThePlayer.queue_free(); # Delete the hitboxes so they can't try anything funny
+	$TakeDamageFromPlayer.queue_free();
 
-# TODO: Let him die
+	await get_tree().create_timer(2.0).timeout # Wait a couple seconds to delete the particles
+	queue_free() # DIE
