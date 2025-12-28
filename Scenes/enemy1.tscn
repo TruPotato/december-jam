@@ -7,12 +7,12 @@
 [ext_resource type="AudioStream" uid="uid://bgacnwrtryurg" path="res://Audio/enemy_hit.wav" id="5_2m8t8"]
 [ext_resource type="PackedScene" uid="uid://d145sysh30f4t" path="res://Scenes/Reusables/star_particle.tscn" id="6_pjoma"]
 
-[sub_resource type="Animation" id="Animation_x4ypu"]
-length = 0.001
+[sub_resource type="Animation" id="Animation_v54tr"]
+resource_name = "reset"
 tracks/0/type = "value"
 tracks/0/imported = false
 tracks/0/enabled = true
-tracks/0/path = NodePath("BasicEnemy/EnemySprite:visible")
+tracks/0/path = NodePath("EnemySprite:visible")
 tracks/0/interp = 1
 tracks/0/loop_wrap = true
 tracks/0/keys = {
@@ -24,53 +24,115 @@ tracks/0/keys = {
 tracks/1/type = "value"
 tracks/1/imported = false
 tracks/1/enabled = true
-tracks/1/path = NodePath("BasicEnemy/EnemySprite:material:shader_parameter/enabled")
+tracks/1/path = NodePath("EnemySprite:material")
 tracks/1/interp = 1
 tracks/1/loop_wrap = true
 tracks/1/keys = {
 "times": PackedFloat32Array(0),
 "transitions": PackedFloat32Array(1),
 "update": 1,
-"values": [false]
+"values": [null]
 }
 tracks/2/type = "value"
 tracks/2/imported = false
 tracks/2/enabled = true
-tracks/2/path = NodePath("BasicEnemy/EnemySprite:material:shader_parameter/colour")
+tracks/2/path = NodePath("Defeat:playing")
 tracks/2/interp = 1
 tracks/2/loop_wrap = true
 tracks/2/keys = {
 "times": PackedFloat32Array(0),
 "transitions": PackedFloat32Array(1),
-"update": 0,
-"values": [Color(1, 1, 1, 1)]
+"update": 1,
+"values": [false]
 }
 
-[sub_resource type="ShaderMaterial" id="ShaderMaterial_x4ypu"]
-shader = ExtResource("2_ite14")
-shader_parameter/enabled = false
-shader_parameter/colour = Color(1, 1, 1, 1)
-
-[sub_resource type="Animation" id="Animation_1rhlf"]
-resource_name = "defeat_animation"
-length = 0.85
-step = 0.05
+[sub_resource type="Animation" id="Animation_ite14"]
+length = 0.001
 tracks/0/type = "value"
 tracks/0/imported = false
 tracks/0/enabled = true
-tracks/0/path = NodePath("BasicEnemy/EnemySprite:material")
+tracks/0/path = NodePath("EnemySprite:visible")
 tracks/0/interp = 1
 tracks/0/loop_wrap = true
 tracks/0/keys = {
 "times": PackedFloat32Array(0),
 "transitions": PackedFloat32Array(1),
 "update": 1,
-"values": [SubResource("ShaderMaterial_x4ypu")]
+"values": [true]
 }
 tracks/1/type = "value"
 tracks/1/imported = false
 tracks/1/enabled = true
-tracks/1/path = NodePath("BasicEnemy/EnemySprite:material:shader_parameter/enabled")
+tracks/1/path = NodePath("EnemySprite:material")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [null]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("EnemySprite:material:shader_parameter/enabled")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [true]
+}
+tracks/3/type = "value"
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/path = NodePath("EnemySprite:material:shader_parameter/colour")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Color(1, 1, 1, 1)]
+}
+tracks/4/type = "value"
+tracks/4/imported = false
+tracks/4/enabled = true
+tracks/4/path = NodePath("Defeat:playing")
+tracks/4/interp = 1
+tracks/4/loop_wrap = true
+tracks/4/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [false]
+}
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_tq1cn"]
+shader = ExtResource("2_ite14")
+shader_parameter/enabled = true
+shader_parameter/colour = Color(1, 1, 1, 1)
+
+[sub_resource type="Animation" id="Animation_2m8t8"]
+resource_name = "defeat_animation"
+step = 0.05
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("EnemySprite:material")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [SubResource("ShaderMaterial_tq1cn")]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("EnemySprite:material:shader_parameter/enabled")
 tracks/1/interp = 1
 tracks/1/loop_wrap = true
 tracks/1/keys = {
@@ -82,76 +144,45 @@ tracks/1/keys = {
 tracks/2/type = "value"
 tracks/2/imported = false
 tracks/2/enabled = true
-tracks/2/path = NodePath("BasicEnemy/EnemySprite:material:shader_parameter/colour")
+tracks/2/path = NodePath("EnemySprite:material:shader_parameter/colour")
 tracks/2/interp = 1
 tracks/2/loop_wrap = true
 tracks/2/keys = {
 "times": PackedFloat32Array(0, 0.1, 0.3, 0.45, 0.65),
 "transitions": PackedFloat32Array(1, 1, 1, 1, 1),
 "update": 1,
-"values": [Color(1, 1, 1, 1), Color(1, 1, 1, 1), Color(0.44, 0.44, 0.44, 1), Color(0.23, 0.23, 0.23, 1), Color(1, 1, 1, 1)]
+"values": [Color(1, 1, 1, 1), Color(1, 1, 1, 1), Color(0.4392157, 0.4392157, 0.4392157, 1), Color(0.23137255, 0.23137255, 0.23137255, 1), Color(1, 1, 1, 1)]
 }
-tracks/3/type = "audio"
+tracks/3/type = "value"
 tracks/3/imported = false
 tracks/3/enabled = true
-tracks/3/path = NodePath("BasicEnemy/Defeat")
+tracks/3/path = NodePath("EnemySprite:visible")
 tracks/3/interp = 1
 tracks/3/loop_wrap = true
 tracks/3/keys = {
-"clips": [{
-"end_offset": 0.0,
-"start_offset": 0.0,
-"stream": ExtResource("3_tq1cn")
-}],
-"times": PackedFloat32Array(0)
-}
-tracks/3/use_blend = true
-tracks/4/type = "value"
-tracks/4/imported = false
-tracks/4/enabled = true
-tracks/4/path = NodePath("BasicEnemy/EnemySprite:visible")
-tracks/4/interp = 1
-tracks/4/loop_wrap = true
-tracks/4/keys = {
 "times": PackedFloat32Array(0, 0.1, 0.2, 0.25, 0.3, 0.35, 0.45, 0.55, 0.6, 0.65, 0.7, 0.75, 0.8, 0.85),
 "transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1),
 "update": 1,
 "values": [true, false, true, false, true, false, true, false, true, false, true, false, true, false]
 }
-
-[sub_resource type="Animation" id="Animation_cjj88"]
-resource_name = "reset"
-length = 0.001
-tracks/0/type = "value"
-tracks/0/imported = false
-tracks/0/enabled = true
-tracks/0/path = NodePath("BasicEnemy/EnemySprite:material")
-tracks/0/interp = 1
-tracks/0/loop_wrap = true
-tracks/0/keys = {
-"times": PackedFloat32Array(0),
-"transitions": PackedFloat32Array(1),
-"update": 1,
-"values": [null]
-}
-tracks/1/type = "value"
-tracks/1/imported = false
-tracks/1/enabled = true
-tracks/1/path = NodePath("BasicEnemy/EnemySprite:visible")
-tracks/1/interp = 1
-tracks/1/loop_wrap = true
-tracks/1/keys = {
+tracks/4/type = "value"
+tracks/4/imported = false
+tracks/4/enabled = true
+tracks/4/path = NodePath("Defeat:playing")
+tracks/4/interp = 1
+tracks/4/loop_wrap = true
+tracks/4/keys = {
 "times": PackedFloat32Array(0),
 "transitions": PackedFloat32Array(1),
 "update": 1,
 "values": [true]
 }
 
-[sub_resource type="AnimationLibrary" id="AnimationLibrary_11jsg"]
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_pjoma"]
 _data = {
-&"RESET": SubResource("Animation_x4ypu"),
-&"defeat_animation": SubResource("Animation_1rhlf"),
-&"reset": SubResource("Animation_cjj88")
+&"RESET": SubResource("Animation_ite14"),
+&"defeat_animation": SubResource("Animation_2m8t8"),
+&"reset": SubResource("Animation_v54tr")
 }
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_8y5mx"]
@@ -202,9 +233,8 @@ collision_layer = 0
 script = ExtResource("1_r5e6g")
 
 [node name="EnemyPlayer" type="AnimationPlayer" parent="."]
-root_node = NodePath("../..")
 libraries = {
-&"": SubResource("AnimationLibrary_11jsg")
+&"": SubResource("AnimationLibrary_pjoma")
 }
 autoplay = "reset"
 
@@ -221,6 +251,7 @@ volume_db = -5.0
 bus = &"SFX"
 
 [node name="Defeat" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("3_tq1cn")
 bus = &"SFX"
 
 [node name="StarParticles" type="Node" parent="."]

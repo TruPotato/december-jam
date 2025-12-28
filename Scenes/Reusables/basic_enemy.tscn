@@ -1,6 +1,6 @@
 [gd_scene load_steps=17 format=3 uid="uid://gnxm0jmfcopl"]
 
-[ext_resource type="Script" path="res://Scripts/Gameplay/basic_enemy.gd" id="1_prowa"]
+[ext_resource type="Script" uid="uid://cclfugaart0h0" path="res://Scripts/Gameplay/basic_enemy.gd" id="1_prowa"]
 [ext_resource type="Texture2D" uid="uid://by31hobmanf0x" path="res://Graphics/kobo1.png" id="2_cjj88"]
 [ext_resource type="Shader" uid="uid://dk86wcgh17nm7" path="res://Scripts/Shaders/colour_blocking.gdshader" id="2_eh6rn"]
 [ext_resource type="AudioStream" uid="uid://cisu8w5we0bky" path="res://Audio/enemy_boom.wav" id="3_1rhlf"]
@@ -211,6 +211,7 @@ libraries = {
 autoplay = "reset"
 
 [node name="EnemySprite" type="AnimatedSprite2D" parent="."]
+material = SubResource("ShaderMaterial_x4ypu")
 sprite_frames = SubResource("SpriteFrames_w7dut")
 animation = &"idle"
 autoplay = "idle"
