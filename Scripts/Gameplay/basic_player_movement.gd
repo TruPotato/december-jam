@@ -24,7 +24,8 @@ var atk = 1
 var jumped = false; # Variable for determining if coyote time still applies and if downward velocity should be applied when releasing jump
 var state = GROUNDED; # Sets the default state to GROUNDED or 0.
 
-var health = 3; # Default health value.
+var max_health = 3.0; # Default health value. might change with levels?
+var health = 3.0; # You die when this is 0.
 
 var coyote_default = 10; # Default coyote time so we can reset to it after each fall.
 var coyote_time; # Sets itself to the default when grounded; "coyote time" determines how long after leaving a ledge you can still jump.
@@ -42,7 +43,8 @@ var just_got_hurt = false # for now hehehehehe
 @export var death_screen = "death_screen"
 
 @onready var player_sprite = $PlayerSprite # The sprite node.
-@onready var sfx = $PlayerSFX
+@onready var sfx = $PlayerSFX; # The sounds.
+@onready var UI = get_tree().get_nodes_in_group("UI")[0]; # Gets the UI node, which is attached to the camera.
 
 # Observe player's hurtbox
 @onready var ReceiveDamage = $ReceiveDamage
@@ -224,6 +226,8 @@ func get_hit():
 		var areas = ReceiveDamage.get_overlapping_areas()
 		var enemy = areas[0].get_parent()
 		health -= enemy.DAMAGE
+		UI.find_children("Health")[0].scale.y = health/max_health;
+		print(health/max_health);
 		current_iframes = IFRAMES
 		state = HURT
 		just_got_hurt = true
