@@ -34,7 +34,7 @@ var thruster     = true
 var base_atk    = 1 # variable in case we want there to be upgrades
 var maximum_atk = 3 # variable in case we want there to be upgrades
 var atk = 1 # this is the damage we will actually deal, may increase when doing a combo, using a skill, etc.
-var damaged_enemy_this_frame = false # If an enemy was damaged on this frame, it is set to true.
+var damaged_enemy_this_frame = false # If an enemy was damaged on this frame, it is set to true. May be unnecessary????
 
 # Control movement
 var jumped = false; # Variable for determining if coyote time still applies and if downward velocity should be applied when releasing jump
@@ -191,6 +191,7 @@ func dead(_delta):
 func groundpounding(_delta): # GO DOWN FAST UNTIL LAND (will need more behaviors later, such as for breaking breakable tiles)
 	velocity.x = 0
 	velocity.y = 300
+	atk = 2
 	# Down here same as in airborne, exit groundpound state on floor collide.
 	if is_on_floor(): # If we hit the ground, switch states to GROUNDED and reset some variables.
 		state = GROUNDED
@@ -305,23 +306,28 @@ func entered_player_is_hurt_area(area): # Player will take damage from something
 		player_knockback(enemy) # Take knockback.
 
 func entered_enemy_is_hurt_area(area): # Player is dealing damage, context dependent. JUMPHIT
-	if damaged_enemy_this_frame == true:
-		return # If an enemy has already been damaged this frame, ignore this.
+
+	#if damaged_enemy_this_frame == true:
+	#	return # If an enemy has already been damaged this frame, ignore this.
+
 	var hurt_enemy = area.get_parent() # Retrieve enemy node.
 	if hurt_enemy.has_method("enemy_took_damage") and velocity.y>0:
 		hurt_enemy.enemy_took_damage(self)
-		damaged_enemy_this_frame = true
+		#damaged_enemy_this_frame = true
 		# Bounnce off enemy.
 		if Input.is_action_pressed("jump"):
 			jump()
 		else: velocity.y = hurt_enemy.bounce_velocity
-		
-		atk +=1
-		if atk > maximum_atk:
-			atk = maximum_atk
-		
+
+		if state != GROUNDPOUNDING:
+			increase_combo()
+
 		if state == GROUNDPOUNDING:
-			atk = 1 # "1" is a placeholder value, we can decide later if groundpounding adds extra damage or whatever
+			damaged_enemy_this_frame = false # Objectively speaking we DID hurt an enemy this frame, but we want the groundpound to be capable of hurting overlapping enemies.
+			if hurt_enemy.health > 0: # if an enemy survives, set to airborne so we can bounce off it, and increase combo as if this had been a normal stomp
+				state = AIRBORNE
+				velocity.y = hurt_enemy.bounce_velocity
+				atk = maximum_atk # combo doesn't build up from groundpound. well not right now, we can decide otherwise later lol
 
 func player_get_hit(enemy): # Works with RECEIVEDAMAGE
 	health -= enemy.damage
@@ -332,6 +338,11 @@ func player_get_hit(enemy): # Works with RECEIVEDAMAGE
 	just_got_hurt = true
 	last_enemy = enemy # important for determining knockback direction
 	print(health)
+
+func increase_combo():
+	atk += 1
+	if atk > maximum_atk:
+		atk = maximum_atk
 
 func player_knockback(enemy):
 	var knockback_direction = 1 # right

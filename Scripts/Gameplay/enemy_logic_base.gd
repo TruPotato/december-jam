@@ -7,7 +7,7 @@ enum STATES {
 	DEFEATED, # Stops normal functioning and prepares to remove enemy from the world.
 }
 var current_state = STATES.NORMAL
-var hurt_time_length = 0.5 # How long the enemy is hurt for.
+var hurt_time_length = 0.25 # How long the enemy is hurt for.
 var hurt_timer = 0.0 # The actual countdown.
 
 
