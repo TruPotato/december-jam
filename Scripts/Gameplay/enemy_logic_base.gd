@@ -1,0 +1,78 @@
+extends Node2D
+
+enum STATES {
+	NORMAL, # Predefined by the behaviour script.
+	HURT, # Stops normal functioning, staggers, still affected by physics.
+	FROZEN, # Stops all code, including physics.
+	DEFEATED, # Stops normal functioning and prepares to remove enemy from the world.
+}
+var current_state = STATES.NORMAL
+var hurt_time_length = 0.5 # How long the enemy is hurt for.
+var hurt_timer = 0.0 # The actual countdown.
+
+
+@export var health = 3
+@export var damage = 1
+@export var damage_knockback = Vector2(50, -100) # The knockback after the player takes damage.
+@export var dealt_i_frames = 0.4 # How many i_frames the player gets after taking damage.
+@export var bounce_velocity = -180 # The burst of upward speed after bouncing off the enemy.
+enum DIRECTIONS {
+	LEFT = -1,
+	RIGHT = 1
+}
+@export var start_direction: DIRECTIONS
+
+var alive = true
+
+@onready var movement_body = $EnemyMovementBody
+
+func _ready():
+	movement_body.position = position
+	movement_body.direction = start_direction
+
+func _physics_process(delta):
+	
+	match current_state:
+		STATES.NORMAL:
+			movement_body.movement_logic_loop(delta)
+			position = movement_body.position
+		STATES.HURT:
+			movement_body.movement_stopped(delta)
+			position = movement_body.position
+			hurt_timer -= delta
+			if hurt_timer <= 0.0:
+				current_state = STATES.NORMAL
+		STATES.DEFEATED:
+			movement_body.movement_stopped(delta)
+			position = movement_body.position
+
+
+func player_took_damage():
+	pass
+
+func enemy_took_damage(player):
+	health -= player.atk
+	if health > 0:
+		# Regular hurt.
+		enemy_got_hurt()
+		hurt_timer = hurt_time_length
+		current_state = STATES.HURT
+	else:
+		#Defeat.
+		current_state = STATES.DEFEATED
+		defeat_enemy()
+
+func enemy_got_hurt():
+	$Hurt.play()
+	$EnemyPlayer.play("hurt_flash")
+	$EnemySprite.play("hurt")
+
+func defeat_enemy():
+	alive = false
+	# Disable hitboxes.
+	$PlayerIsHurtArea.process_mode = Node.PROCESS_MODE_DISABLED
+	$EnemyIsHurtArea.process_mode = Node.PROCESS_MODE_DISABLED
+	$EnemyPlayer.play("defeat_animation")
+	$EnemySprite.play("hurt")
+	await get_tree().create_timer(2.0).timeout
+	queue_free()

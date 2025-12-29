@@ -38,7 +38,7 @@ func _ready():
 	floor_snap_length = 3.5; # Stick to slopes
 	floor_constant_speed = true; # Don't slow down on slopes
 	currentHP = INITIAL_HP # reset HP
-	#$TakeDamageFromPlayer.connect("body_entered", body_entered_hurtbox) # When a body enters our damage-taking box, run the function body_enetered_hurtbox()
+	#=$TakeDamageFromPlayer.connect("body_entered", body_entered_hurtbox) # When a body enters our damage-taking box, run the function body_enetered_hurtbox()
 	if direction == DIRECTIONS.LEFT:
 		enemy_sprite.flip_h = true
 	else:
@@ -51,7 +51,7 @@ func _physics_process(delta: float) -> void:
 		velocity += get_gravity() * delta
 	
 	# Reenable hitboxes once the enemy is done being stunned
-	if current_iframes <= 0:
+	if current_iframes <= 0 and alive == true:
 		$DamageThePlayer.process_mode = Node.PROCESS_MODE_PAUSABLE
 		$TakeDamageFromPlayer.process_mode = Node.PROCESS_MODE_PAUSABLE
 	
@@ -64,6 +64,7 @@ func _physics_process(delta: float) -> void:
 			hurt_me = 0 # Stop receiving additional damage
 			$EnemySprite.play("hurt") # Play hurt animation.
 			$EnemyPlayer.play("hurt_flash")
+			$Hurt.play()
 			hurt_timer_delta = hurt_time # Set the hurt timer.
 			current_move_state = MOVEMENT_STATE.HURT
 			$DamageThePlayer.process_mode = Node.PROCESS_MODE_DISABLED
@@ -128,6 +129,8 @@ func movement_wander(_delta):
 #		#pass
 
 func enemy_defeated():
+	if alive == false:
+		return
 	
 	$DamageThePlayer.process_mode = Node.PROCESS_MODE_DISABLED; # Disable the hitboxes.
 	$TakeDamageFromPlayer.process_mode = Node.PROCESS_MODE_DISABLED; # ooooooo the debugger does not like this one
@@ -138,10 +141,6 @@ func enemy_defeated():
 	$EnemySprite.play("hurt") # Play our hurt animation
 	$EnemyPlayer.play("defeat_animation") # Play our death flickering
 	await $EnemyPlayer.animation_finished # Wait until that's over
-<<<<<<< Updated upstream
-	$Burst.play() # sound effect :3
-=======
->>>>>>> Stashed changes
 	# Release the star particles.
 	for star in $StarParticles.get_children(): # Explode particles out by looping over them and activating them
 		star.show()

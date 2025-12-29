@@ -6,6 +6,7 @@ enum STATES { # The animation states.
 	RISING,
 	FALLING,
 	LANDING,
+	HURT,
 }
 
 var current_state = STATES.IDLE
@@ -38,3 +39,5 @@ func change_animation_state(new_state):
 			play("land")
 			# Set the landing timer.
 			land_timer = LAND_TIME
+		STATES.HURT:
+			play("hurt")

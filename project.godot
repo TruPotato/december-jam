@@ -80,7 +80,8 @@ accept={
 [layer_names]
 
 2d_physics/layer_1="Main Collision"
-2d_physics/layer_2="Player and Enemies"
+2d_physics/layer_2="Enemy is hurt"
+2d_physics/layer_3="Player is hurt"
 
 [rendering]
 

@@ -8,7 +8,7 @@ const H_SPEED = 200.0 * PIXEL_SCALE # Base horizontal speed
 const AIR_FRICTION = 18 * PIXEL_SCALE; # Friction in the air (determines how much control you have while airborne)
 const GROUND_FRICTION = 30 * PIXEL_SCALE; # Friction on the ground (same as AIR_FRICTION but for the ground)
 const JUMP_VELOCITY = 500.0 * PIXEL_SCALE # Code says jump, this says how high
-const IFRAMES = 1 # invincibility frames
+const IFRAMES = 0.3 # brief invincibility frames after you damage an enemy.
 const DEFAULT_STOMP_BOUNCE = -120 # what will the player's velocity.v be set to when stomping an enemy without pressing jump? this.
 
 # An "enum" or "Enumerator" is a list of variables that equate to integer values; for example, GROUNDED = 0, and AIRBORNE = 1.
@@ -30,6 +30,7 @@ var thruster     = true
 var base_atk    = 1 # variable in case we want there to be upgrades
 var maximum_atk = 3 # variable in case we want there to be upgrades
 var atk = 1 # this is the damage we will actually deal
+var damaged_enemy_this_frame = false # If an enemy was damaged on this frame, it is set to true.
 
 var jumped = false; # Variable for determining if coyote time still applies and if downward velocity should be applied when releasing jump
 var state = GROUNDED; # Sets the default state to GROUNDED or 0.
@@ -46,7 +47,7 @@ var just_landed = false # Set to true if player has just landed.
 
 # Pain related variables
 var last_enemy # Helps us determine where we are getting hit from, relative position to enemy, so we can knockback in the correct direction
-var current_iframes = 0 # take a wild guess what this is for
+var current_iframes = 0.0 # take a wild guess what this is for
 var invincible = false # think mark think
 var just_got_hurt = false # for now hehehehehe
 
@@ -67,18 +68,22 @@ func _ready():
 	coyote_time = coyote_default; # Set coyote time to itself
 	floor_snap_length = 3.5; # Set the floor snap length to 3.5. This allows built in godot functions to lock the player to slopes.
 	floor_constant_speed = true; # Disables moving slowly when going up slopes. We can change this later.
+	# Connect the area signals.
+	ReceiveDamage.connect("area_entered", entered_player_is_hurt_area)
+	JumpHit.connect("area_entered", entered_enemy_is_hurt_area)
+	
 
 # The main loop.
 func _physics_process(delta):
+	damaged_enemy_this_frame = false # Reset this.
+	just_got_hurt = false
 	$Floored.text = "iof: " + str(is_on_floor()); # Display whether the "is_on_floor()" check returns true
 	$FloorNormal.text = "vel: " + str(velocity); # Display velocity
 	$State.text = "State: " + str(state); # Display the Epstein files
 	
-		# Receive damage from enemies
-	if current_iframes <= 0:
-		get_hit()
-	elif invincible == false:
-		current_iframes -= 1*delta
+	if current_iframes > 0.0: # Decrease iframes.
+		current_iframes -= delta
+		if current_iframes < 0.0: current_iframes = 0.0
 	
 	if health <= 0:
 		state = DEAD
@@ -130,10 +135,10 @@ func airborne(_delta): # Airboren actions
 	movement(get_directional_input(), AIR_FRICTION);
 	
 	# Check if we are stomping an enemy and act accordingly if so
-	stomp()
+	#stomp()
 	
 	# Use ground pound
-	if Input.is_action_pressed("move_down") && Input.is_action_just_pressed("jump"): # if we jump while holding down
+	if Input.is_action_just_pressed("move_down"): # if we jump while holding down
 		state = GROUNDPOUNDING # will not actually groundpound until next physics step. I think. That sounds bad.
 	
 	# Apply gravity. If velocity is lower than zero, just apply it normally; otherwise add a multiplier to make for a nicer jump arc.
@@ -165,16 +170,10 @@ func airborne(_delta): # Airboren actions
 
 func hurt(_delta):
 	velocity.y += GRAVITY * GRAVITY_MULT;
-	if is_on_floor() && !just_got_hurt: # If we hit the ground, switch states to GROUNDED and reset some variables. Just got hurt check thing so we do not immediatly go to GROUNDED.
+	if current_iframes <= 0.0 or is_on_floor(): # If we hit the ground, switch states to GROUNDED and reset some variables. Just got hurt check thing so we do not immediatly go to GROUNDED.
 		state = GROUNDED
 		just_landed = true # Set for the sake of animation.
 	#pass <- why the hell was there a pass here? I have disabled it, everything seems to still work fine
-	if just_got_hurt == true:
-		var knockback_direction = 1 # right
-		if position.x < last_enemy.position.x:
-			knockback_direction = -1 # left
-		velocity = Vector2(50*knockback_direction,-100) #knock player up and away from the damage source
-		just_got_hurt = false
 
 func dead(_delta):
 	Globals.change_scene(death_screen)
@@ -184,7 +183,7 @@ func groundpounding(_delta):
 	velocity.x = 0
 	velocity.y = 300
 	# Check if we are stomping an enemy and act accordingly if so
-	stomp()
+	#stomp()
 	# Down here same as in airborne
 	if is_on_floor(): # If we hit the ground, switch states to GROUNDED and reset some variables.
 		state = GROUNDED
@@ -203,7 +202,6 @@ func movement(direction, friction):
 	else:
 		if velocity.x != 0:
 			velocity.x += clampf(0 - velocity.x, -friction, friction)
-
 
 func jump():
 	# i doubt this will get more complex than this but just in case i am making it a function so i don't have repeat code
@@ -246,6 +244,10 @@ func animation_update():
 			else:
 				# Player is falling.
 				player_sprite.change_animation_state(player_sprite.STATES.FALLING)
+		HURT:
+			# Player is hurt.
+			player_sprite.change_animation_state(player_sprite.STATES.HURT)
+	
 	
 	# Set the player's walking sounds.
 	if player_walking == true:
@@ -253,18 +255,50 @@ func animation_update():
 	else:
 		sfx.walk_stop()
 
-func get_hit():
-	if ReceiveDamage.has_overlapping_areas():
-		var areas = ReceiveDamage.get_overlapping_areas()
-		var enemy = areas[0].get_parent()
-		health -= enemy.DAMAGE
-		UI.find_children("Health")[0].scale.y = health/max_health;
-		print(health/max_health);
-		current_iframes = IFRAMES
-		state = HURT
-		just_got_hurt = true
-		last_enemy = enemy
-		print(health)
+
+func entered_player_is_hurt_area(area): # Player will take damage from something.
+	if current_iframes > 0.0:
+		return # Player is invincible, return.
+	if damaged_enemy_this_frame == true:
+		return # If an enemy has already been damaged this frame, ignore this.
+	
+	
+	
+	var enemy = area.get_parent() # Retrieve enemy node.
+	if enemy.has_method("player_took_damage"):
+		enemy.player_took_damage()
+		player_get_hit(enemy) # Take damage.
+		player_knockback(enemy) # Take knockback.
+
+func entered_enemy_is_hurt_area(area): # Player is dealing damage, context dependent.
+	if damaged_enemy_this_frame == true:
+		return # If an enemy has already been damaged this frame, ignore this.
+	pass
+	var hurt_enemy = area.get_parent() # Retrieve enemy node.
+	if hurt_enemy.has_method("enemy_took_damage"):
+		hurt_enemy.enemy_took_damage(self)
+		damaged_enemy_this_frame = true
+		# Bounnce off enemy.
+		velocity.y = hurt_enemy.bounce_velocity
+
+func player_get_hit(enemy):
+	health -= enemy.damage
+	UI.find_children("Health")[0].scale.y = health/max_health;
+	print(health/max_health);
+	current_iframes = enemy.dealt_i_frames # Retrieve i_frames from enemy.
+	state = HURT
+	just_got_hurt = true
+	last_enemy = enemy
+	print(health)
+
+func player_knockback(enemy):
+	var knockback_direction = 1 # right
+	if position.x < enemy.position.x:
+		knockback_direction = -1 # left
+	velocity = Vector2(enemy.damage_knockback.x * knockback_direction,enemy.damage_knockback.y) #knock player up and away from the damage source
+	move_and_slide()
+
+
 
 func stomp():
 	if velocity.y >0: # We should not be able to stomp, say, on our way up.

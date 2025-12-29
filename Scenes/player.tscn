@@ -1,4 +1,4 @@
-[gd_scene load_steps=23 format=3 uid="uid://bt2dxigvk0kth"]
+[gd_scene load_steps=24 format=3 uid="uid://bt2dxigvk0kth"]
 
 [ext_resource type="Script" uid="uid://cnccg6pbdd32d" path="res://Scripts/Gameplay/basic_player_movement.gd" id="1_v0iea"]
 [ext_resource type="Texture2D" uid="uid://b78l5uba8tn3e" path="res://Graphics/skele1.png" id="2_cvnsp"]
@@ -11,6 +11,10 @@
 [sub_resource type="AtlasTexture" id="AtlasTexture_8erm5"]
 atlas = ExtResource("2_cvnsp")
 region = Rect2(24, 24, 24, 24)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_gymyn"]
+atlas = ExtResource("2_cvnsp")
+region = Rect2(72, 24, 24, 24)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_cvnsp"]
 atlas = ExtResource("2_cvnsp")
@@ -48,6 +52,14 @@ animations = [{
 }],
 "loop": true,
 "name": &"fall",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_gymyn")
+}],
+"loop": true,
+"name": &"hurt",
 "speed": 5.0
 }, {
 "frames": [{
@@ -141,7 +153,7 @@ script = ExtResource("1_v0iea")
 
 [node name="PlayerSprite" type="AnimatedSprite2D" parent="."]
 sprite_frames = SubResource("SpriteFrames_vgqql")
-animation = &"land"
+animation = &"fall"
 autoplay = "idle"
 offset = Vector2(0, -12)
 script = ExtResource("3_vgqql")
