@@ -167,11 +167,14 @@ func airborne(_delta): # Airboren actions
 func hurt(_delta):
 	velocity.y += GRAVITY * GRAVITY_MULT; # apply gravity
 	if current_iframes <= 0.0 or is_on_floor(): # If we hit the ground, switch states to GROUNDED and reset some variables. Just got hurt check thing so we do not immediatly go to GROUNDED.
-		state = GROUNDED # if we're in the ground this will work well and if not it will turn us to airborne which also works YIPPIEEEE
+		state = GROUNDED # if we're on the ground this will work well and if not it will turn us to airborne which also works YIPPIEEEE
 		just_landed = true # Set for the sake of animation.
 
 func dead(_delta):
-	Globals.change_scene(death_screen) # gives you lupuse
+	velocity = Vector2.ZERO;
+	$PlayerPlayer.play("die"); # use the animation player to play a quick death animation
+	await $PlayerPlayer.animation_finished; # wait for that to be over
+	Globals.change_scene(death_screen) # contract lupuse
 
 func groundpounding(_delta): # GO DOWN FAST UNTIL LAND (will need more behaviors later, such as for breaking breakable tiles)
 	velocity.x = 0
@@ -235,8 +238,8 @@ func animation_update():
 			else:
 				# Player is falling.
 				player_sprite.change_animation_state(player_sprite.STATES.FALLING)
-		HURT:
-			# Player is hurt.
+		HURT || DEAD:
+			# Player is hurt or dead.
 			player_sprite.change_animation_state(player_sprite.STATES.HURT)
 	
 	

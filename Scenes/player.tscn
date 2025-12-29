@@ -1,12 +1,20 @@
-[gd_scene load_steps=24 format=3 uid="uid://bt2dxigvk0kth"]
+[gd_scene load_steps=31 format=3 uid="uid://bt2dxigvk0kth"]
 
 [ext_resource type="Script" uid="uid://cnccg6pbdd32d" path="res://Scripts/Gameplay/basic_player_movement.gd" id="1_v0iea"]
+[ext_resource type="Shader" uid="uid://dk86wcgh17nm7" path="res://Scripts/Shaders/colour_blocking.gdshader" id="2_8erm5"]
 [ext_resource type="Texture2D" uid="uid://b78l5uba8tn3e" path="res://Graphics/skele1.png" id="2_cvnsp"]
 [ext_resource type="FontFile" uid="uid://c4uwm7m7pvmig" path="res://Graphics/POCKETPIXELREGULAR.TTF" id="3_6t5aa"]
 [ext_resource type="Script" uid="uid://cm32rq6q28bvf" path="res://Scripts/Gameplay/player_sprite_animation.gd" id="3_vgqql"]
 [ext_resource type="Script" uid="uid://7y4ey27kdad2" path="res://Scripts/Sound/player_sfx.gd" id="5_fkybt"]
 [ext_resource type="AudioStream" uid="uid://blrgwr3lgrooi" path="res://Audio/jump.wav" id="6_x3wgy"]
 [ext_resource type="AudioStream" uid="uid://pymr4c5hnxo" path="res://Audio/step.wav" id="7_3smsa"]
+[ext_resource type="AudioStream" uid="uid://ccopxrtcuqx0x" path="res://Audio/player_die.wav" id="9_f1ek2"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_f1ek2"]
+resource_local_to_scene = true
+shader = ExtResource("2_8erm5")
+shader_parameter/enabled = false
+shader_parameter/colour = Color(1, 1, 1, 1)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_8erm5"]
 atlas = ExtResource("2_cvnsp")
@@ -104,6 +112,180 @@ animations = [{
 "speed": 6.6
 }]
 
+[sub_resource type="Animation" id="Animation_tx1dd"]
+resource_name = "die"
+length = 1.5
+step = 0.05
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("PlayerSprite:rotation")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.05, 0.1, 0.15, 0.19999999, 0.25, 0.36250004, 0.51250005, 0.71250004, 0.9125),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1, 1, 1, 1, 1),
+"update": 1,
+"values": [-1.5707963267948966, -3.141592653589793, -4.71238898038469, 0.0, -1.5707963267948966, -3.141592653589793, -4.71238898038469, 0.0, -1.5707963267948966, -3.141592653589793]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("PlayerSprite:position")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0, 0.05, 0.1, 0.15, 0.2, 0.25, 0.3, 0.35, 0.4, 0.45),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1, 1, 1, 1, 1),
+"update": 1,
+"values": [Vector2(0, -12), Vector2(0, -22), Vector2(0, -25), Vector2(0, -27), Vector2(0, -28), Vector2(0, -29), Vector2(0, -30), Vector2(0, -31), Vector2(0, -32), Vector2(0, -33)]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("PlayerSprite:material:shader_parameter/enabled")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0, 0.1, 0.2, 0.3, 0.45, 0.5, 0.55, 0.6, 0.65, 0.7, 0.75),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1),
+"update": 1,
+"values": [true, false, true, false, true, false, true, false, true, false, true]
+}
+tracks/3/type = "value"
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/path = NodePath("PlayerSprite:material:shader_parameter/colour")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/keys = {
+"times": PackedFloat32Array(0, 0.45, 0.55, 0.65, 0.75, 0.85),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1),
+"update": 1,
+"values": [Color(1, 1, 1, 1), Color(0.581033, 0.58103293, 0.5810329, 1), Color(0.31061712, 0.31061712, 0.3106171, 1), Color(0.15487596, 0.154876, 0.15487596, 1), Color(1, 1, 1, 1), Color(1, 0, 0.50980395, 1)]
+}
+tracks/4/type = "value"
+tracks/4/imported = false
+tracks/4/enabled = true
+tracks/4/path = NodePath("PlayerSprite:visible")
+tracks/4/interp = 1
+tracks/4/loop_wrap = true
+tracks/4/keys = {
+"times": PackedFloat32Array(0, 1),
+"transitions": PackedFloat32Array(1, 1),
+"update": 1,
+"values": [true, false]
+}
+tracks/5/type = "value"
+tracks/5/imported = false
+tracks/5/enabled = true
+tracks/5/path = NodePath("PlayerSFX/PlayerDie:playing")
+tracks/5/interp = 1
+tracks/5/loop_wrap = true
+tracks/5/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [true]
+}
+
+[sub_resource type="Animation" id="Animation_gymyn"]
+resource_name = "reset"
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("PlayerSprite:visible")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [true]
+}
+
+[sub_resource type="Animation" id="Animation_8erm5"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("PlayerSprite:visible")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [true]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("PlayerSprite:rotation")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [0.0]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("PlayerSprite:position")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(0, -12)]
+}
+tracks/3/type = "value"
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/path = NodePath("PlayerSprite:material:shader_parameter/enabled")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [false]
+}
+tracks/4/type = "value"
+tracks/4/imported = false
+tracks/4/enabled = true
+tracks/4/path = NodePath("PlayerSprite:material:shader_parameter/colour")
+tracks/4/interp = 1
+tracks/4/loop_wrap = true
+tracks/4/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Color(1, 1, 1, 1)]
+}
+tracks/5/type = "value"
+tracks/5/imported = false
+tracks/5/enabled = true
+tracks/5/path = NodePath("PlayerSFX/PlayerDie:playing")
+tracks/5/interp = 1
+tracks/5/loop_wrap = true
+tracks/5/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [false]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_pu2lt"]
+_data = {
+&"RESET": SubResource("Animation_8erm5"),
+&"die": SubResource("Animation_tx1dd"),
+&"reset": SubResource("Animation_gymyn")
+}
+
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_v0iea"]
 radius = 6.0
 height = 20.0
@@ -152,17 +334,25 @@ collision_layer = 0
 script = ExtResource("1_v0iea")
 
 [node name="PlayerSprite" type="AnimatedSprite2D" parent="."]
+material = SubResource("ShaderMaterial_f1ek2")
+position = Vector2(0, -12)
 sprite_frames = SubResource("SpriteFrames_vgqql")
 animation = &"fall"
 autoplay = "idle"
-offset = Vector2(0, -12)
 script = ExtResource("3_vgqql")
+
+[node name="PlayerPlayer" type="AnimationPlayer" parent="."]
+libraries = {
+&"": SubResource("AnimationLibrary_pu2lt")
+}
+autoplay = "RESET"
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 position = Vector2(0, -10)
 shape = SubResource("CapsuleShape2D_v0iea")
 
 [node name="State" type="Label" parent="."]
+visible = false
 offset_left = -13.0
 offset_top = -46.0
 offset_right = 27.0
@@ -171,6 +361,7 @@ text = "TEST"
 label_settings = SubResource("LabelSettings_vgqql")
 
 [node name="Floored" type="Label" parent="."]
+visible = false
 offset_left = -13.0
 offset_top = -28.0
 offset_right = 27.0
@@ -179,6 +370,7 @@ text = "TEST"
 label_settings = SubResource("LabelSettings_vgqql")
 
 [node name="FloorNormal" type="Label" parent="."]
+visible = false
 offset_left = -13.0
 offset_top = -37.0
 offset_right = 27.0
@@ -207,6 +399,9 @@ bus = &"SFX"
 stream = ExtResource("7_3smsa")
 volume_db = -11.335
 bus = &"SFX"
+
+[node name="PlayerDie" type="AudioStreamPlayer" parent="PlayerSFX"]
+stream = ExtResource("9_f1ek2")
 
 [node name="StepLoopPlayer" type="AnimationPlayer" parent="PlayerSFX"]
 libraries = {

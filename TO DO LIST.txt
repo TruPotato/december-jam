@@ -11,7 +11,8 @@ THINGS TO DO:
 	- ✓ lose condition
 
 	- ✓ health display
-	-   polished death state for player
+	- ✓ polished death state for player
+		-   more polish! more polish!! [bart gif]
 
 	-   carrying states
 		-   airborne
