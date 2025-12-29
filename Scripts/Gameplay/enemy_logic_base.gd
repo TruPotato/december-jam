@@ -15,7 +15,7 @@ var hurt_timer = 0.0 # The actual countdown.
 @export var damage = 1
 @export var damage_knockback = Vector2(50, -100) # The knockback after the player takes damage.
 @export var dealt_i_frames = 0.4 # How many i_frames the player gets after taking damage.
-@export var bounce_velocity = -180 # The burst of upward speed after bouncing off the enemy.
+@export var bounce_velocity = -80 # The burst of upward speed after bouncing off the enemy.
 enum DIRECTIONS {
 	LEFT = -1,
 	RIGHT = 1

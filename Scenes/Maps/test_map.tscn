@@ -40,7 +40,7 @@ length = 0.001
 tracks/0/type = "value"
 tracks/0/imported = false
 tracks/0/enabled = true
-tracks/0/path = NodePath("EnemySprite:visible")
+tracks/0/path = NodePath("../EnemyLogic/EnemySprite:visible")
 tracks/0/interp = 1
 tracks/0/loop_wrap = true
 tracks/0/keys = {
@@ -52,7 +52,7 @@ tracks/0/keys = {
 tracks/1/type = "value"
 tracks/1/imported = false
 tracks/1/enabled = true
-tracks/1/path = NodePath("EnemySprite:material")
+tracks/1/path = NodePath("../EnemyLogic/EnemySprite:material")
 tracks/1/interp = 1
 tracks/1/loop_wrap = true
 tracks/1/keys = {
@@ -64,7 +64,7 @@ tracks/1/keys = {
 tracks/2/type = "value"
 tracks/2/imported = false
 tracks/2/enabled = true
-tracks/2/path = NodePath("EnemySprite:material:shader_parameter/enabled")
+tracks/2/path = NodePath("../EnemyLogic/EnemySprite:material:shader_parameter/enabled")
 tracks/2/interp = 1
 tracks/2/loop_wrap = true
 tracks/2/keys = {
@@ -76,7 +76,7 @@ tracks/2/keys = {
 tracks/3/type = "value"
 tracks/3/imported = false
 tracks/3/enabled = true
-tracks/3/path = NodePath("EnemySprite:material:shader_parameter/colour")
+tracks/3/path = NodePath("../EnemyLogic/EnemySprite:material:shader_parameter/colour")
 tracks/3/interp = 1
 tracks/3/loop_wrap = true
 tracks/3/keys = {
@@ -88,7 +88,7 @@ tracks/3/keys = {
 tracks/4/type = "value"
 tracks/4/imported = false
 tracks/4/enabled = true
-tracks/4/path = NodePath("Defeat:playing")
+tracks/4/path = NodePath("../EnemyLogic/Defeat:playing")
 tracks/4/interp = 1
 tracks/4/loop_wrap = true
 tracks/4/keys = {
@@ -109,7 +109,7 @@ step = 0.05
 tracks/0/type = "value"
 tracks/0/imported = false
 tracks/0/enabled = true
-tracks/0/path = NodePath("EnemySprite:material")
+tracks/0/path = NodePath("../EnemyLogic/EnemySprite:material")
 tracks/0/interp = 1
 tracks/0/loop_wrap = true
 tracks/0/keys = {
@@ -121,7 +121,7 @@ tracks/0/keys = {
 tracks/1/type = "value"
 tracks/1/imported = false
 tracks/1/enabled = true
-tracks/1/path = NodePath("EnemySprite:material:shader_parameter/enabled")
+tracks/1/path = NodePath("../EnemyLogic/EnemySprite:material:shader_parameter/enabled")
 tracks/1/interp = 1
 tracks/1/loop_wrap = true
 tracks/1/keys = {
@@ -133,7 +133,7 @@ tracks/1/keys = {
 tracks/2/type = "value"
 tracks/2/imported = false
 tracks/2/enabled = true
-tracks/2/path = NodePath("EnemySprite:material:shader_parameter/colour")
+tracks/2/path = NodePath("../EnemyLogic/EnemySprite:material:shader_parameter/colour")
 tracks/2/interp = 1
 tracks/2/loop_wrap = true
 tracks/2/keys = {
@@ -145,7 +145,7 @@ tracks/2/keys = {
 tracks/3/type = "value"
 tracks/3/imported = false
 tracks/3/enabled = true
-tracks/3/path = NodePath("EnemySprite:visible")
+tracks/3/path = NodePath("../EnemyLogic/EnemySprite:visible")
 tracks/3/interp = 1
 tracks/3/loop_wrap = true
 tracks/3/keys = {
@@ -157,7 +157,7 @@ tracks/3/keys = {
 tracks/4/type = "value"
 tracks/4/imported = false
 tracks/4/enabled = true
-tracks/4/path = NodePath("Defeat:playing")
+tracks/4/path = NodePath("../EnemyLogic/Defeat:playing")
 tracks/4/interp = 1
 tracks/4/loop_wrap = true
 tracks/4/keys = {
@@ -169,7 +169,7 @@ tracks/4/keys = {
 tracks/5/type = "method"
 tracks/5/imported = false
 tracks/5/enabled = true
-tracks/5/path = NodePath("Burst")
+tracks/5/path = NodePath("../EnemyLogic/Burst")
 tracks/5/interp = 1
 tracks/5/loop_wrap = true
 tracks/5/keys = {
@@ -188,7 +188,7 @@ step = 0.05
 tracks/0/type = "value"
 tracks/0/imported = false
 tracks/0/enabled = true
-tracks/0/path = NodePath("EnemySprite:visible")
+tracks/0/path = NodePath("../EnemyLogic/EnemySprite:visible")
 tracks/0/interp = 1
 tracks/0/loop_wrap = true
 tracks/0/keys = {
@@ -203,7 +203,7 @@ resource_name = "reset"
 tracks/0/type = "value"
 tracks/0/imported = false
 tracks/0/enabled = true
-tracks/0/path = NodePath("EnemySprite:visible")
+tracks/0/path = NodePath("../EnemyLogic/EnemySprite:visible")
 tracks/0/interp = 1
 tracks/0/loop_wrap = true
 tracks/0/keys = {
@@ -215,7 +215,7 @@ tracks/0/keys = {
 tracks/1/type = "value"
 tracks/1/imported = false
 tracks/1/enabled = true
-tracks/1/path = NodePath("EnemySprite:material")
+tracks/1/path = NodePath("../EnemyLogic/EnemySprite:material")
 tracks/1/interp = 1
 tracks/1/loop_wrap = true
 tracks/1/keys = {
@@ -227,7 +227,7 @@ tracks/1/keys = {
 tracks/2/type = "value"
 tracks/2/imported = false
 tracks/2/enabled = true
-tracks/2/path = NodePath("Defeat:playing")
+tracks/2/path = NodePath("../EnemyLogic/Defeat:playing")
 tracks/2/interp = 1
 tracks/2/loop_wrap = true
 tracks/2/keys = {
@@ -366,6 +366,7 @@ tile_set = SubResource("TileSet_jah6w")
 
 [node name="EnemyLogic" parent="." instance=ExtResource("7_8y5mx")]
 position = Vector2(60, 433)
+bounce_velocity = -100
 start_direction = -1
 
 [node name="Hurt" type="AudioStreamPlayer" parent="EnemyLogic"]
@@ -420,5 +421,65 @@ movement_mode = 1
 sprite = NodePath("../EnemySprite")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="EnemyLogic/EnemyMovementBody"]
+position = Vector2(0, -8)
+shape = SubResource("RectangleShape2D_rnym6")
+
+[node name="EnemyLogic2" parent="." instance=ExtResource("7_8y5mx")]
+position = Vector2(122, 471)
+bounce_velocity = -100
+start_direction = -1
+
+[node name="Hurt" type="AudioStreamPlayer" parent="EnemyLogic2"]
+stream = ExtResource("4_jah6w")
+volume_db = -5.0
+bus = &"SFX"
+
+[node name="Burst" type="AudioStreamPlayer" parent="EnemyLogic2"]
+stream = ExtResource("5_f4dah")
+volume_db = -2.0
+bus = &"SFX"
+
+[node name="Defeat" type="AudioStreamPlayer" parent="EnemyLogic2"]
+stream = ExtResource("6_w7dut")
+bus = &"SFX"
+
+[node name="EnemyPlayer" type="AnimationPlayer" parent="EnemyLogic2"]
+libraries = {
+&"": SubResource("AnimationLibrary_pjoma")
+}
+autoplay = "reset"
+
+[node name="EnemySprite" type="AnimatedSprite2D" parent="EnemyLogic2"]
+sprite_frames = SubResource("SpriteFrames_jah6w")
+animation = &"idle"
+autoplay = "idle"
+offset = Vector2(0, -12)
+
+[node name="PlayerIsHurtArea" type="Area2D" parent="EnemyLogic2"]
+collision_layer = 4
+collision_mask = 4
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="EnemyLogic2/PlayerIsHurtArea"]
+position = Vector2(0, -7)
+shape = SubResource("RectangleShape2D_wrd4j")
+debug_color = Color(0.7, 0.19833331, 0, 0.41960785)
+
+[node name="EnemyIsHurtArea" type="Area2D" parent="EnemyLogic2"]
+collision_layer = 2
+collision_mask = 2
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="EnemyLogic2/EnemyIsHurtArea"]
+position = Vector2(0, -16.5)
+shape = SubResource("RectangleShape2D_o1aaj")
+debug_color = Color(0.55999994, 0.7, 0, 0.41960785)
+
+[node name="EnemyMovementBody" type="CharacterBody2D" parent="EnemyLogic2" node_paths=PackedStringArray("sprite")]
+top_level = true
+collision_layer = 0
+script = ExtResource("5_wrd4j")
+movement_mode = 1
+sprite = NodePath("../EnemySprite")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="EnemyLogic2/EnemyMovementBody"]
 position = Vector2(0, -8)
 shape = SubResource("RectangleShape2D_rnym6")

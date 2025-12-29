@@ -11,7 +11,6 @@ enum MODES {
 @export var movement_mode: MODES
 @export var sprite: Node
 
-
 enum DIRECTIONS {
 	LEFT = -1,
 	RIGHT = 1
@@ -41,7 +40,7 @@ func movement_logic_loop(delta): # Default movement loop.
 func movement_wander(_delta):
 	velocity.x = direction * wander_speed
 	move_and_slide()
-	if is_on_wall():
+	if is_on_wall(): # turn around after hitting a wall
 		direction *= -1
 	
 	if direction == DIRECTIONS.LEFT:

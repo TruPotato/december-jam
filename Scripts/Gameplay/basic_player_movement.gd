@@ -29,9 +29,10 @@ var thruster     = true
 # violence :D
 var base_atk    = 1 # variable in case we want there to be upgrades
 var maximum_atk = 3 # variable in case we want there to be upgrades
-var atk = 1 # this is the damage we will actually deal
+var atk = 1 # this is the damage we will actually deal, may increase when doing a combo, using a skill, etc.
 var damaged_enemy_this_frame = false # If an enemy was damaged on this frame, it is set to true.
 
+# Control movement
 var jumped = false; # Variable for determining if coyote time still applies and if downward velocity should be applied when releasing jump
 var state = GROUNDED; # Sets the default state to GROUNDED or 0.
 
@@ -60,7 +61,7 @@ var just_got_hurt = false # for now hehehehehe
 # Observe player's hurtbox
 @onready var ReceiveDamage = $ReceiveDamage
 
-# Observe the player's... stompbox? I don't wanna call it a hitbox that is ambiguousas fuck.
+# Observe the player's... stompbox? I don't wanna call it a hitbox that is ambiguous as fuck.
 @onready var JumpHit = $JumpHit
 
 # When first loaded:
@@ -73,7 +74,6 @@ func _ready():
 	JumpHit.connect("area_entered", entered_enemy_is_hurt_area)
 	
 
-# The main loop.
 func _physics_process(delta):
 	damaged_enemy_this_frame = false # Reset this.
 	just_got_hurt = false
@@ -97,14 +97,12 @@ func _physics_process(delta):
 	# Update the player sprite.
 	animation_update()
 
-# Get the player's directional input.
-func get_directional_input():
+func get_directional_input(): # Get the player's directional input.
 	var result = Vector2.ZERO
 	result = Input.get_vector("move_left", "move_right", "move_up", "move_down") # Uses inputs to generate a Vector2.
 	return result
 
-# Change the way the player moves based on the current type of action
-func state_machine(_delta):
+func state_machine(_delta): # Change the way the player moves based on the current type of action
 	match state: # Check the current state and run some code based on its value
 		GROUNDED:
 			grounded(_delta);
@@ -121,7 +119,7 @@ func grounded(_delta): # Grounded actions
 	# Get player input and do movement
 	movement(get_directional_input(), GROUND_FRICTION)
 	
-	atk = base_atk
+	atk = base_atk # kill the combo
 	
 	if Input.is_action_just_pressed("jump"): # If the player pressed the jump button...
 		# ...jump.
@@ -139,7 +137,9 @@ func airborne(_delta): # Airboren actions
 	
 	# Use ground pound
 	if Input.is_action_just_pressed("move_down"): # if we jump while holding down
-		state = GROUNDPOUNDING # will not actually groundpound until next physics step. I think. That sounds bad.
+		state = GROUNDPOUNDING
+		groundpounding(_delta)
+		return
 	
 	# Apply gravity. If velocity is lower than zero, just apply it normally; otherwise add a multiplier to make for a nicer jump arc.
 	if velocity.y < 0:
@@ -169,17 +169,15 @@ func airborne(_delta): # Airboren actions
 		just_landed = true # Set for the sake of animation.
 
 func hurt(_delta):
-	velocity.y += GRAVITY * GRAVITY_MULT;
+	velocity.y += GRAVITY * GRAVITY_MULT; # apply gravity
 	if current_iframes <= 0.0 or is_on_floor(): # If we hit the ground, switch states to GROUNDED and reset some variables. Just got hurt check thing so we do not immediatly go to GROUNDED.
-		state = GROUNDED
+		state = GROUNDED # if we're in the ground this will work well and if not it will turn us to airborne which also works YIPPIEEEE
 		just_landed = true # Set for the sake of animation.
-	#pass <- why the hell was there a pass here? I have disabled it, everything seems to still work fine
 
 func dead(_delta):
-	Globals.change_scene(death_screen)
-	pass
+	Globals.change_scene(death_screen) # gives you lupuse
 
-func groundpounding(_delta):
+func groundpounding(_delta): # GO DOWN FAST UNTIL LAND (will need more behaviors later, such as for breaking breakable tiles)
 	velocity.x = 0
 	velocity.y = 300
 	# Check if we are stomping an enemy and act accordingly if so
@@ -190,7 +188,6 @@ func groundpounding(_delta):
 		jumped = false;
 		coyote_time = coyote_default;
 		just_landed = true # Set for the sake of animation.
-	pass
 
 # Does the movement, applying friction as necessary.
 func movement(direction, friction):
@@ -255,7 +252,6 @@ func animation_update():
 	else:
 		sfx.walk_stop()
 
-
 func entered_player_is_hurt_area(area): # Player will take damage from something.
 	if current_iframes > 0.0:
 		return # Player is invincible, return.
@@ -270,18 +266,23 @@ func entered_player_is_hurt_area(area): # Player will take damage from something
 		player_get_hit(enemy) # Take damage.
 		player_knockback(enemy) # Take knockback.
 
-func entered_enemy_is_hurt_area(area): # Player is dealing damage, context dependent.
+func entered_enemy_is_hurt_area(area): # Player is dealing damage, context dependent. JUMPHIT
 	if damaged_enemy_this_frame == true:
 		return # If an enemy has already been damaged this frame, ignore this.
-	pass
 	var hurt_enemy = area.get_parent() # Retrieve enemy node.
 	if hurt_enemy.has_method("enemy_took_damage"):
 		hurt_enemy.enemy_took_damage(self)
 		damaged_enemy_this_frame = true
 		# Bounnce off enemy.
-		velocity.y = hurt_enemy.bounce_velocity
+		if Input.is_action_pressed("jump"):
+			jump()
+		else: velocity.y = hurt_enemy.bounce_velocity
+		
+		atk +=1
+		if atk > maximum_atk:
+			atk = maximum_atk
 
-func player_get_hit(enemy):
+func player_get_hit(enemy): # Works with RECEIVEDAMAGE
 	health -= enemy.damage
 	UI.find_children("Health")[0].scale.y = health/max_health;
 	print(health/max_health);
@@ -298,9 +299,7 @@ func player_knockback(enemy):
 	velocity = Vector2(enemy.damage_knockback.x * knockback_direction,enemy.damage_knockback.y) #knock player up and away from the damage source
 	move_and_slide()
 
-
-
-func stomp():
+func stomp(): # literally all calls for this are commented out after Casey's refactor, EPIC.
 	if velocity.y >0: # We should not be able to stomp, say, on our way up.
 		if JumpHit.get_overlapping_areas(): # are we even stomping anything
 			var areas = JumpHit.get_overlapping_areas() # okay who are we stomping
