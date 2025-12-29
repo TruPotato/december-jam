@@ -3,7 +3,7 @@ checkmark for copying and pasting ✓
 THINGS TO DO:
 	- ✓ player movement calculations and feel
 		-   bouncing refactor
-		-   combo damage
+		- ✓ combo damage
 		-   damage stars
 	- ✓ basic enemy code
 		- ✓ refactor
@@ -21,6 +21,7 @@ THINGS TO DO:
 		-   obtension
 		- ✓ ground pound
 			-   hitbox fix
+			-   bouncing fix
 		-   fireball
 		-   parry
 		-   alchemical thruster
