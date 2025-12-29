@@ -15,12 +15,12 @@ THINGS TO DO:
 	- ✓ polished death state for player
 		-   more polish! more polish!! [bart gif]
 
-	-   carrying states
-		-   airborne
-		-   grounded
+	- ✓ carrying states
+		-   finish airborne
+		-   finish grounded
 
 	-   abilities
-		-   obtension
+		- ✓ obtension
 		- ✓ ground pound
 			-   hitbox fix
 			-   bouncing fix
