@@ -4,6 +4,7 @@ THINGS TO DO:
 	- ✓ player movement calculations and feel
 		-   bouncing refactor
 		-   combo damage
+		-   damage stars
 	- ✓ basic enemy code
 		- ✓ refactor
 	- ✓ health
@@ -17,6 +18,7 @@ THINGS TO DO:
 		-   grounded
 
 	-   abilities
+		-   obtension
 		- ✓ ground pound
 			-   hitbox fix
 		-   fireball
