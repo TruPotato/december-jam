@@ -312,13 +312,19 @@ func entered_enemy_is_hurt_area(area): # Player is dealing damage, context depen
 	var hurt_enemy # need this in a high scope
 
 	if state == GROUNDPOUNDING:
+		# for some reason only detecting the overlap of 1 area instead of many... sometimes it detects 2 which is even more perplexing.
 		for i in $JumpHit.get_overlapping_areas().size(): # groundpound can hurt multiple enemies at once, this will iterate over all enemies our hitbox is on when the triggering signal is sent
+			
+			print("iterating to " + str($JumpHit.get_overlapping_areas().size()))
+			print("hurting " + str(i) + " with attack " + str(atk))
+			
 			hurt_enemy=$JumpHit.get_overlapping_areas()[i].get_parent() # Retrieve enemy node for current iteration.
+			
 			if hurt_enemy.has_method("enemy_took_damage"): # this conditional exists to ignore hitboxes corresponding to unhurtable nodes
 				hurt_enemy.enemy_took_damage(self) # the enemy will take damage using us as the argument
 			
-				if hurt_enemy.health > 0: # pply bouncing behavior if one or more enemies survive
-					state = AIRBORNE
+				if hurt_enemy.health > 0: # apply bouncing behavior if one or more enemies survive
+					#state = AIRBORNE
 					if hurt_enemy.bounce_velocity < velocity.y: # apply the highest bounce velocity from among all the surviving enemies we hit. Player does not (currently) have a say in how high they go
 						velocity.y = hurt_enemy.bounce_velocity
 
