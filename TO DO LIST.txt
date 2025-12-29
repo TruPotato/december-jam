@@ -11,6 +11,7 @@ THINGS TO DO:
 	- ✓ lose condition
 
 	- ✓ health display
+		- make it work with gfx. discover if godot has a masking function
 	- ✓ polished death state for player
 		-   more polish! more polish!! [bart gif]
 

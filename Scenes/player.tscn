@@ -337,7 +337,7 @@ script = ExtResource("1_v0iea")
 material = SubResource("ShaderMaterial_f1ek2")
 position = Vector2(0, -12)
 sprite_frames = SubResource("SpriteFrames_vgqql")
-animation = &"fall"
+animation = &"hurt"
 autoplay = "idle"
 script = ExtResource("3_vgqql")
 

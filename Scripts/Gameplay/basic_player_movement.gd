@@ -1,10 +1,12 @@
 extends CharacterBody2D
 
+#region Variables
 const PIXEL_SCALE = 0.4 # Temporary, for scaling the physics down to pixel size.
 
 const GRAVITY = 7.5; # Base gravity NOTE: (Casey) I temporarily changed this to be lower from 10.0, feel free to revert it later.
 const GRAVITY_MULT = 3.5 * PIXEL_SCALE; # Multiplier to apply when falling
 const H_SPEED = 200.0 * PIXEL_SCALE # Base horizontal speed
+const CARRYING_MULT = 0.75; # Move speed multiplier for when the player is carrying a party member.
 const AIR_FRICTION = 18 * PIXEL_SCALE; # Friction in the air (determines how much control you have while airborne)
 const GROUND_FRICTION = 30 * PIXEL_SCALE; # Friction on the ground (same as AIR_FRICTION but for the ground)
 const JUMP_VELOCITY = 500.0 * PIXEL_SCALE # Code says jump, this says how high
@@ -17,7 +19,9 @@ enum { # These are possible gameplay states. It will probably become longer late
 	AIRBORNE,
 	DEAD,
 	HURT,
-	GROUNDPOUNDING
+	GROUNDPOUNDING,
+	CARRYING,
+	CARRYING_AIRBORNE
 }
 
 # skills. Do we have them? true or false
@@ -63,6 +67,7 @@ var just_got_hurt = false # for now hehehehehe
 
 # Observe the player's... stompbox? I don't wanna call it a hitbox that is ambiguous as fuck.
 @onready var JumpHit = $JumpHit
+#endregion
 
 # When first loaded:
 func _ready():
@@ -73,6 +78,7 @@ func _ready():
 	ReceiveDamage.connect("area_entered", entered_player_is_hurt_area)
 	JumpHit.connect("area_entered", entered_enemy_is_hurt_area)
 
+#region Main Loop
 func _physics_process(delta):
 	damaged_enemy_this_frame = false # Reset this.
 	just_got_hurt = false
@@ -95,12 +101,9 @@ func _physics_process(delta):
 	
 	# Update the player sprite.
 	animation_update()
+#endregion
 
-func get_directional_input(): # Get the player's directional input.
-	var result = Vector2.ZERO
-	result = Input.get_vector("move_left", "move_right", "move_up", "move_down") # Uses inputs to generate a Vector2.
-	return result
-
+#region State Machine
 func state_machine(_delta): # Change the way the player moves based on the current type of action
 	match state: # Check the current state and run some code based on its value
 		GROUNDED:
@@ -113,23 +116,32 @@ func state_machine(_delta): # Change the way the player moves based on the curre
 			dead(_delta);
 		GROUNDPOUNDING:
 			groundpounding(_delta);
+		CARRYING:
+			carrying(_delta);
+		CARRYING_AIRBORNE:
+			carrying_airborne(_delta);
 
 func grounded(_delta): # Grounded actions
 	# Get player input and do movement
-	movement(get_directional_input(), GROUND_FRICTION)
+	movement(get_directional_input(), GROUND_FRICTION, H_SPEED)
 	
 	atk = base_atk # kill the combo
 	
 	if Input.is_action_just_pressed("jump"): # If the player pressed the jump button...
 		# ...jump.
 		jump();
+	
+	# Using the debug key to change states to CARRYING for testing.
+	# TODO: figure out the real way we'll switch to the carrying state
+	if Input.is_action_just_pressed("debug_key"):
+		state = CARRYING;
 
 	if !is_on_floor(): # If we leave the ground for any reason, switch states to AIRBORNE.
 		state = AIRBORNE;
 
 func airborne(_delta): # Airboren actions
 	# Get player input and do movement
-	movement(get_directional_input(), AIR_FRICTION);
+	movement(get_directional_input(), AIR_FRICTION, H_SPEED);
 	
 	# Use ground pound
 	if Input.is_action_just_pressed("move_down") and ground_pound: # if we press down while airborne AND we have unlocked the groundpound ability
@@ -186,22 +198,32 @@ func groundpounding(_delta): # GO DOWN FAST UNTIL LAND (will need more behaviors
 		coyote_time = coyote_default;
 		just_landed = true # Set for the sake of animation.
 
-# Does the movement, applying friction as necessary.
-func movement(direction, friction):
-	# Check if direction is zero.
-	# If it isn't, move velocity in the input direction, ramping up speed until a maximum.
-	# If it is, move velocity back towards 0
-	if direction != Vector2.ZERO:
-		velocity.x = clampf(velocity.x + direction.x * friction, -H_SPEED, H_SPEED);
+func carrying(_delta):
+	movement(get_directional_input(), GROUND_FRICTION, H_SPEED * CARRYING_MULT); # make the player move slow
+	atk = base_atk; # kill the combo if that's even possible while carrying
+
+	if Input.is_action_just_pressed("debug_key"): # switch back to the grounded state for debug
+		state = GROUNDED;
+
+	if !is_on_floor(): # if you leave the ground, change states
+		state = CARRYING_AIRBORNE;
+
+func carrying_airborne(_delta):
+	movement(get_directional_input(), AIR_FRICTION, H_SPEED * CARRYING_MULT); # make the player move slow AND in the air
+
+	if velocity.y < 0: # Gravity. Do it harder after a while. The usual.
+		velocity.y += GRAVITY;
 	else:
-		if velocity.x != 0:
-			velocity.x += clampf(0 - velocity.x, -friction, friction)
+		velocity.y += GRAVITY * GRAVITY_MULT;
 
-func jump():
-	# i doubt this will get more complex than this but just in case i am making it a function so i don't have repeat code
-	velocity.y = -JUMP_VELOCITY;
-	sfx.play_sfx(sfx.JUMP)
+	if is_on_floor(): # Same as airborne. This whole state is essentially just "airborne but slow and you can't jump" for now.
+		state = CARRYING;
+		jumped = false;
+		coyote_time = coyote_default;
+		just_landed = true;
+#endregion
 
+#region Animation
 # Update the player's sprite.
 func animation_update():
 	# Set player facing direction.
@@ -221,7 +243,7 @@ func animation_update():
 	var player_walking = false
 	# Check is player is airborne.
 	match state:
-		GROUNDED:
+		GROUNDED, CARRYING:
 			# Player is on the ground.
 			if abs(velocity.x) < 15.0:
 				# Player is still.
@@ -230,7 +252,7 @@ func animation_update():
 				# Player is walking, or at least moving horizontally on the ground.
 				player_sprite.change_animation_state(player_sprite.STATES.WALKING)
 				player_walking = true
-		AIRBORNE:
+		AIRBORNE, CARRYING_AIRBORNE:
 			# Player is in the air.
 			if velocity.y < 0.0:
 				# Player is rising.
@@ -238,7 +260,7 @@ func animation_update():
 			else:
 				# Player is falling.
 				player_sprite.change_animation_state(player_sprite.STATES.FALLING)
-		HURT || DEAD:
+		HURT, DEAD:
 			# Player is hurt or dead.
 			player_sprite.change_animation_state(player_sprite.STATES.HURT)
 	
@@ -248,17 +270,36 @@ func animation_update():
 		sfx.walk_loop()
 	else:
 		sfx.walk_stop()
+#endregion
+
+#region Miscellaneous
+func get_directional_input(): # Get the player's directional input.
+	var result = Vector2.ZERO
+	result = Input.get_vector("move_left", "move_right", "move_up", "move_down") # Uses inputs to generate a Vector2.
+	return result
+
+func movement(direction, friction, speed): # Does the movement, applying friction as necessary.
+	# Check if direction is zero.
+	# If it isn't, move velocity in the input direction, ramping up speed until a maximum.
+	# If it is, move velocity back towards 0
+	if direction != Vector2.ZERO:
+		velocity.x = clampf(velocity.x + direction.x * friction, -speed, speed);
+	else:
+		if velocity.x != 0:
+			velocity.x += clampf(0 - velocity.x, -friction, friction)
+
+func jump():
+	# i doubt this will get more complex than this but just in case i am making it a function so i don't have repeat code
+	# future note: oh shit, we can use it for sound effects! nice
+	velocity.y = -JUMP_VELOCITY;
+	sfx.play_sfx(sfx.JUMP)
 
 func entered_player_is_hurt_area(area): # Player will take damage from something.
-	if current_iframes > 0.0:
-		return # Player is invincible, return.
-	if damaged_enemy_this_frame == true:
-		return # If an enemy has already been damaged this frame, ignore this.
-	
-	
+	if current_iframes > 0.0 || damaged_enemy_this_frame:
+		return # Player is invincible or we already did damage this frame, return.
 	
 	var enemy = area.get_parent() # Retrieve enemy node.
-	if enemy.has_method("player_took_damage"):
+	if enemy.has_method("player_took_damage"): # Make sure the game doesn't crash by calling a nonexistent function
 		enemy.player_took_damage()
 		player_get_hit(enemy) # Take damage.
 		player_knockback(enemy) # Take knockback.
@@ -284,7 +325,7 @@ func entered_enemy_is_hurt_area(area): # Player is dealing damage, context depen
 
 func player_get_hit(enemy): # Works with RECEIVEDAMAGE
 	health -= enemy.damage
-	UI.find_children("Health")[0].scale.y = health/max_health;
+	UI.find_children("Health")[0].scale.y = clamp(health/max_health, 0, 1);
 	print(health/max_health);
 	current_iframes = enemy.dealt_i_frames # Retrieve i_frames from enemy. NOTE: Wouldn't it be better for player iframes to always be the same, and determined in this very file?
 	state = HURT
@@ -298,3 +339,4 @@ func player_knockback(enemy):
 		knockback_direction = -1 # left
 	velocity = Vector2(enemy.damage_knockback.x * knockback_direction,enemy.damage_knockback.y) #knock player up and away from the damage source
 	move_and_slide()
+#endregion
