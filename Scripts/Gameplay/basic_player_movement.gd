@@ -20,7 +20,7 @@ enum { # These are possible gameplay states. It will probably become longer late
 	GROUNDPOUNDING
 }
 
-# skills
+# skills. Do we have them? true or false
 var ground_pound = true
 var fire_dash    = true
 var parry        = true
@@ -72,7 +72,6 @@ func _ready():
 	# Connect the area signals.
 	ReceiveDamage.connect("area_entered", entered_player_is_hurt_area)
 	JumpHit.connect("area_entered", entered_enemy_is_hurt_area)
-	
 
 func _physics_process(delta):
 	damaged_enemy_this_frame = false # Reset this.
@@ -132,11 +131,8 @@ func airborne(_delta): # Airboren actions
 	# Get player input and do movement
 	movement(get_directional_input(), AIR_FRICTION);
 	
-	# Check if we are stomping an enemy and act accordingly if so
-	#stomp()
-	
 	# Use ground pound
-	if Input.is_action_just_pressed("move_down"): # if we jump while holding down
+	if Input.is_action_just_pressed("move_down") and ground_pound: # if we press down while airborne AND we have unlocked the groundpound ability
 		state = GROUNDPOUNDING
 		groundpounding(_delta)
 		return
@@ -180,9 +176,7 @@ func dead(_delta):
 func groundpounding(_delta): # GO DOWN FAST UNTIL LAND (will need more behaviors later, such as for breaking breakable tiles)
 	velocity.x = 0
 	velocity.y = 300
-	# Check if we are stomping an enemy and act accordingly if so
-	#stomp()
-	# Down here same as in airborne
+	# Down here same as in airborne, exit groundpound state on floor collide.
 	if is_on_floor(): # If we hit the ground, switch states to GROUNDED and reset some variables.
 		state = GROUNDED
 		jumped = false;
@@ -270,7 +264,7 @@ func entered_enemy_is_hurt_area(area): # Player is dealing damage, context depen
 	if damaged_enemy_this_frame == true:
 		return # If an enemy has already been damaged this frame, ignore this.
 	var hurt_enemy = area.get_parent() # Retrieve enemy node.
-	if hurt_enemy.has_method("enemy_took_damage"):
+	if hurt_enemy.has_method("enemy_took_damage") and velocity.y>0:
 		hurt_enemy.enemy_took_damage(self)
 		damaged_enemy_this_frame = true
 		# Bounnce off enemy.
@@ -281,15 +275,18 @@ func entered_enemy_is_hurt_area(area): # Player is dealing damage, context depen
 		atk +=1
 		if atk > maximum_atk:
 			atk = maximum_atk
+		
+		if state == GROUNDPOUNDING:
+			atk = 1 # "1" is a placeholder value, we can decide later if groundpounding adds extra damage or whatever
 
 func player_get_hit(enemy): # Works with RECEIVEDAMAGE
 	health -= enemy.damage
 	UI.find_children("Health")[0].scale.y = health/max_health;
 	print(health/max_health);
-	current_iframes = enemy.dealt_i_frames # Retrieve i_frames from enemy.
+	current_iframes = enemy.dealt_i_frames # Retrieve i_frames from enemy. NOTE: Wouldn't it be better for player iframes to always be the same, and determined in this very file?
 	state = HURT
 	just_got_hurt = true
-	last_enemy = enemy
+	last_enemy = enemy # important for determining knockback direction
 	print(health)
 
 func player_knockback(enemy):
@@ -298,26 +295,3 @@ func player_knockback(enemy):
 		knockback_direction = -1 # left
 	velocity = Vector2(enemy.damage_knockback.x * knockback_direction,enemy.damage_knockback.y) #knock player up and away from the damage source
 	move_and_slide()
-
-func stomp(): # literally all calls for this are commented out after Casey's refactor, EPIC.
-	if velocity.y >0: # We should not be able to stomp, say, on our way up.
-		if JumpHit.get_overlapping_areas(): # are we even stomping anything
-			var areas = JumpHit.get_overlapping_areas() # okay who are we stomping
-			var victim = areas[0].get_parent() # let's only stomp 1 enemy at once mmmkay? whichever one godot says is [0]
-			victim.hurt_me = atk # tell the enemy to SUFFER (when its their turn to run their code)
-			# Hey, Paul, why do this whole hurt_me charade instead of just reducing the enemy's HP?
-			# Because I want the enemy to be aware that they got hurt and hurt_me being > 0 is a nice way of doing that.
-			# Alternatively we could give the enemies a just_got_hurt bool
-			atk += 1 # reward combos with extra damage
-			if atk > maximum_atk:
-				atk = maximum_atk
-			# Let the groundpound deal x2 damage, even if it exceeds the cap. The way I did it smells like it will brek if we stom through multiple enemies but oh well.
-			if state == GROUNDPOUNDING:
-				atk = 1
-	
-		# Allow the player to control how high they bounce off of enemies when attacking them (works like jumping as if off of ground)
-		if Input.is_action_pressed("jump") && JumpHit.has_overlapping_areas(): # the player is actively trying to jump off of enemies. No "just_pressed", player can just hold, it's okayyyyy
-			jump() # Yeah this works wonders right off the bat
-			jumped = false # I think this is necessary but I honestly haven't even checked
-		elif JumpHit.has_overlapping_areas(): # the player is not pressing jump, apply minimum bounce
-			velocity.y = DEFAULT_STOMP_BOUNCE

@@ -42,10 +42,12 @@ func _physics_process(delta):
 			hurt_timer -= delta
 			if hurt_timer <= 0.0:
 				current_state = STATES.NORMAL
+				# reenable hitboxes when the enemy is done suffering
+				$PlayerIsHurtArea.process_mode = Node.PROCESS_MODE_PAUSABLE
+				$EnemyIsHurtArea.process_mode = Node.PROCESS_MODE_PAUSABLE
 		STATES.DEFEATED:
 			movement_body.movement_stopped(delta)
 			position = movement_body.position
-
 
 func player_took_damage():
 	pass
@@ -57,13 +59,16 @@ func enemy_took_damage(player):
 		enemy_got_hurt()
 		hurt_timer = hurt_time_length
 		current_state = STATES.HURT
+		# Disable hitboxes while the enemy suffers
+		$PlayerIsHurtArea.process_mode = Node.PROCESS_MODE_DISABLED
+		$EnemyIsHurtArea.process_mode = Node.PROCESS_MODE_DISABLED
 	else:
 		#Defeat.
 		current_state = STATES.DEFEATED
 		defeat_enemy()
 
 func enemy_got_hurt():
-	$Hurt.play()
+	$Hurt.play() # sound
 	$EnemyPlayer.play("hurt_flash")
 	$EnemySprite.play("hurt")
 

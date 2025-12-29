@@ -6,8 +6,10 @@
 script = ExtResource("1_k1s0i")
 
 [node name="Label" type="Label" parent="."]
-offset_right = 40.0
-offset_bottom = 23.0
-scale = Vector2(9.689558, 6.8480897)
+offset_left = 24.0
+offset_top = 54.0
+offset_right = 148.0
+offset_bottom = 137.0
+scale = Vector2(3, 3)
 text = "VIDEO GAME
 TITLE"
