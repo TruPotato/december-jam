@@ -34,7 +34,7 @@ var thruster     = true
 var base_atk    = 1 # variable in case we want there to be upgrades
 var maximum_atk = 3 # variable in case we want there to be upgrades
 var atk = 1 # this is the damage we will actually deal, may increase when doing a combo, using a skill, etc.
-var damaged_enemy_this_frame = false # If an enemy was damaged on this frame, it is set to true. May be unnecessary????
+var damaged_enemy_this_frame = false # If an enemy was damaged on this frame, it is set to true. Does not seem very necessary but it's a nice safety measure.
 
 # Control movement
 var jumped = false; # Variable for determining if coyote time still applies and if downward velocity should be applied when releasing jump
@@ -306,28 +306,31 @@ func entered_player_is_hurt_area(area): # Player will take damage from something
 		player_knockback(enemy) # Take knockback.
 
 func entered_enemy_is_hurt_area(area): # Player is dealing damage, context dependent. JUMPHIT
+	
+	damaged_enemy_this_frame = true
+	
+	var hurt_enemy # need this in a high scope
 
-	#if damaged_enemy_this_frame == true:
-	#	return # If an enemy has already been damaged this frame, ignore this.
+	if state == GROUNDPOUNDING:
+		for i in $JumpHit.get_overlapping_areas().size(): # groundpound can hurt multiple enemies at once, this will iterate over all enemies our hitbox is on when the triggering signal is sent
+			hurt_enemy=$JumpHit.get_overlapping_areas()[i].get_parent() # Retrieve enemy node for current iteration.
+			if hurt_enemy.has_method("enemy_took_damage"): # this conditional exists to ignore hitboxes corresponding to unhurtable nodes
+				hurt_enemy.enemy_took_damage(self) # the enemy will take damage using us as the argument
+			
+				if hurt_enemy.health > 0: # pply bouncing behavior if one or more enemies survive
+					state = AIRBORNE
+					if hurt_enemy.bounce_velocity < velocity.y: # apply the highest bounce velocity from among all the surviving enemies we hit. Player does not (currently) have a say in how high they go
+						velocity.y = hurt_enemy.bounce_velocity
 
-	var hurt_enemy = area.get_parent() # Retrieve enemy node.
-	if hurt_enemy.has_method("enemy_took_damage") and velocity.y>0:
-		hurt_enemy.enemy_took_damage(self)
-		#damaged_enemy_this_frame = true
-		# Bounnce off enemy.
-		if Input.is_action_pressed("jump"):
-			jump()
-		else: velocity.y = hurt_enemy.bounce_velocity
-
-		if state != GROUNDPOUNDING:
+	else:
+		hurt_enemy = area.get_parent() # Retrieve enemy node.
+		if hurt_enemy.has_method("enemy_took_damage") and velocity.y>0:
+			hurt_enemy.enemy_took_damage(self) # the enemy will take damage using us as the argument
+			# Bounnce off enemy.
+			if Input.is_action_pressed("jump"):
+				jump()
+			else: velocity.y = hurt_enemy.bounce_velocity
 			increase_combo()
-
-		if state == GROUNDPOUNDING:
-			damaged_enemy_this_frame = false # Objectively speaking we DID hurt an enemy this frame, but we want the groundpound to be capable of hurting overlapping enemies.
-			if hurt_enemy.health > 0: # if an enemy survives, set to airborne so we can bounce off it, and increase combo as if this had been a normal stomp
-				state = AIRBORNE
-				velocity.y = hurt_enemy.bounce_velocity
-				atk = maximum_atk # combo doesn't build up from groundpound. well not right now, we can decide otherwise later lol
 
 func player_get_hit(enemy): # Works with RECEIVEDAMAGE
 	health -= enemy.damage
