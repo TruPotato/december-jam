@@ -35,6 +35,7 @@ var base_atk    = 1 # variable in case we want there to be upgrades
 var maximum_atk = 3 # variable in case we want there to be upgrades
 var atk = 1 # this is the damage we will actually deal, may increase when doing a combo, using a skill, etc.
 var damaged_enemy_this_frame = false # If an enemy was damaged on this frame, it is set to true. Does not seem very necessary but it's a nice safety measure.
+var there_are_things_to_attack = false
 
 # Control movement
 var jumped = false; # Variable for determining if coyote time still applies and if downward velocity should be applied when releasing jump
@@ -98,6 +99,9 @@ func _physics_process(delta):
 
 	# Apply physics and move.
 	move_and_slide()
+	if there_are_things_to_attack == true and state == GROUNDPOUNDING:
+		groundpound_attack()
+	there_are_things_to_attack = false
 	
 	# Update the player sprite.
 	animation_update()
@@ -191,7 +195,7 @@ func dead(_delta):
 func groundpounding(_delta): # GO DOWN FAST UNTIL LAND (will need more behaviors later, such as for breaking breakable tiles)
 	velocity.x = 0
 	velocity.y = 300
-	atk = 2
+	atk = 1
 	# Down here same as in airborne, exit groundpound state on floor collide.
 	if is_on_floor(): # If we hit the ground, switch states to GROUNDED and reset some variables.
 		state = GROUNDED
@@ -305,31 +309,12 @@ func entered_player_is_hurt_area(area): # Player will take damage from something
 		player_get_hit(enemy) # Take damage.
 		player_knockback(enemy) # Take knockback.
 
-func entered_enemy_is_hurt_area(area): # Player is dealing damage, context dependent. JUMPHIT
+func entered_enemy_is_hurt_area(area): # Activated by signal, causes the player to deal damage
 	
-	damaged_enemy_this_frame = true
+	there_are_things_to_attack = true # Needed to activate groundpound logic independently from signal activation because signals have ghosts in them (too long to detail here ask us)
 	
-	var hurt_enemy # need this in a high scope
-
-	if state == GROUNDPOUNDING:
-		# for some reason only detecting the overlap of 1 area instead of many... sometimes it detects 2 which is even more perplexing.
-		for i in $JumpHit.get_overlapping_areas().size(): # groundpound can hurt multiple enemies at once, this will iterate over all enemies our hitbox is on when the triggering signal is sent
-			
-			print("iterating to " + str($JumpHit.get_overlapping_areas().size()))
-			print("hurting " + str(i) + " with attack " + str(atk))
-			
-			hurt_enemy=$JumpHit.get_overlapping_areas()[i].get_parent() # Retrieve enemy node for current iteration.
-			
-			if hurt_enemy.has_method("enemy_took_damage"): # this conditional exists to ignore hitboxes corresponding to unhurtable nodes
-				hurt_enemy.enemy_took_damage(self) # the enemy will take damage using us as the argument
-			
-				if hurt_enemy.health > 0: # apply bouncing behavior if one or more enemies survive
-					#state = AIRBORNE
-					if hurt_enemy.bounce_velocity < velocity.y: # apply the highest bounce velocity from among all the surviving enemies we hit. Player does not (currently) have a say in how high they go
-						velocity.y = hurt_enemy.bounce_velocity
-
-	else:
-		hurt_enemy = area.get_parent() # Retrieve enemy node.
+	if state != GROUNDPOUNDING: # We only want to do regular stomp logic here.
+		var hurt_enemy = area.get_parent() # Retrieve enemy node.
 		if hurt_enemy.has_method("enemy_took_damage") and velocity.y>0:
 			hurt_enemy.enemy_took_damage(self) # the enemy will take damage using us as the argument
 			# Bounnce off enemy.
@@ -337,6 +322,35 @@ func entered_enemy_is_hurt_area(area): # Player is dealing damage, context depen
 				jump()
 			else: velocity.y = hurt_enemy.bounce_velocity
 			increase_combo()
+
+func groundpound_attack(): # Will only be activated if entered_enemy_is_hurt_area(area) is activated by the signal.
+	
+	damaged_enemy_this_frame = true
+	
+	var hurt_enemy # need this in a high scope
+
+	# for some reason only detecting the overlap of 1 area instead of many... sometimes it detects 2 which is even more perplexing.
+	for i in $JumpHit.get_overlapping_areas().size(): # groundpound can hurt multiple enemies at once, this will iterate over all enemies our hitbox is on when the triggering signal is sent
+		
+		hurt_enemy=$JumpHit.get_overlapping_areas()[i].get_parent() # Retrieve enemy node for current iteration.
+		
+		if hurt_enemy.has_method("enemy_took_damage"): # this conditional exists to ignore hitboxes corresponding to unhurtable nodes
+			hurt_enemy.enemy_took_damage(self) # the enemy will take damage using us as the argument
+		
+			if hurt_enemy.health > 0: # apply bouncing behavior if one or more enemies survive
+				state = AIRBORNE
+				if hurt_enemy.bounce_velocity < velocity.y: # apply the highest bounce velocity from among all the surviving enemies we hit. Player does not (currently) have a say in how high they go
+					velocity.y = hurt_enemy.bounce_velocity
+
+	#else:
+	#	hurt_enemy = area.get_parent() # Retrieve enemy node.
+	#	if hurt_enemy.has_method("enemy_took_damage") and velocity.y>0:
+	#		hurt_enemy.enemy_took_damage(self) # the enemy will take damage using us as the argument
+	#		# Bounnce off enemy.
+	#		if Input.is_action_pressed("jump"):
+	#			jump()
+	#		else: velocity.y = hurt_enemy.bounce_velocity
+	#		increase_combo()
 
 func player_get_hit(enemy): # Works with RECEIVEDAMAGE
 	health -= enemy.damage
@@ -359,4 +373,5 @@ func player_knockback(enemy):
 		knockback_direction = -1 # left
 	velocity = Vector2(enemy.damage_knockback.x * knockback_direction,enemy.damage_knockback.y) #knock player up and away from the damage source
 	move_and_slide()
+
 #endregion
