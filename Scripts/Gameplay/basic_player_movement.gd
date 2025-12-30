@@ -97,6 +97,7 @@ func _physics_process(delta):
 		if current_iframes < 0.0: current_iframes = 0.0
 	
 	if health <= 0:
+		UI.find_child("HealthBorder").frame = 1;
 		state = DEAD
 
 	# Debug gunk
@@ -340,7 +341,7 @@ func groundpound_attack(): # Will only be activated if entered_enemy_is_hurt_are
 
 func player_get_hit(enemy): # Works with RECEIVEDAMAGE
 	health -= enemy.damage
-	UI.find_children("Health")[0].scale.y = clamp(health/max_health, 0, 1);
+	UI.find_children("Health")[0].scale.x = clamp(health/max_health, 0, 1);
 	print(health/max_health);
 	current_iframes = enemy.dealt_i_frames # Retrieve i_frames from enemy. NOTE: Wouldn't it be better for player iframes to always be the same, and determined in this very file?
 	state = HURT
@@ -380,6 +381,7 @@ func escape(delta):
 	if remaining_time > 0:
 		remaining_time -= delta;
 	else: # If we are, contract lupuse
+		UI.find_child("HealthBorder").frame = 1;
 		state = DEAD;
 		remaining_time = 0;
 #endregion

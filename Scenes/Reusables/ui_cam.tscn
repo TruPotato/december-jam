@@ -1,0 +1,66 @@
+[gd_scene load_steps=3 format=3 uid="uid://c36mdljvd8373"]
+
+[ext_resource type="FontFile" uid="uid://84eralmscntv" path="res://Graphics/AstronauticalFont.ttf" id="1_fu88f"]
+[ext_resource type="Texture2D" uid="uid://cknrr03sb3u0h" path="res://Graphics/healthbar.png" id="2_0h4br"]
+
+[node name="Camera2D" type="Camera2D"]
+limit_enabled = false
+limit_left = -80
+limit_top = 45
+limit_right = 272
+limit_bottom = 506
+
+[node name="UI" type="CanvasLayer" parent="." groups=["UI"]]
+
+[node name="Background" type="ColorRect" parent="UI"]
+offset_right = 360.0
+offset_bottom = 61.0
+color = Color(0, 0, 0, 1)
+
+[node name="HealthLabel" type="Label" parent="UI"]
+offset_left = 6.0
+offset_top = 4.0
+offset_right = 46.0
+offset_bottom = 27.0
+theme_override_fonts/font = ExtResource("1_fu88f")
+theme_override_font_sizes/font_size = 11
+text = "Health"
+
+[node name="EmptyHealth" type="ColorRect" parent="UI"]
+offset_left = 5.0
+offset_top = 19.0
+offset_right = 147.0
+offset_bottom = 36.0
+color = Color(0, 0, 0, 1)
+
+[node name="Health" type="ColorRect" parent="UI"]
+offset_left = 5.0
+offset_top = 19.0
+offset_right = 147.0
+offset_bottom = 37.0
+pivot_offset = Vector2(0, 40)
+color = Color(1, 0, 0.38039216, 1)
+
+[node name="HealthBorder" type="Sprite2D" parent="UI"]
+position = Vector2(76, 28)
+texture = ExtResource("2_0h4br")
+hframes = 2
+
+[node name="EscapeTimer" type="Label" parent="UI"]
+visible = false
+offset_left = 2.0
+offset_top = 2.0
+offset_right = 216.0
+offset_bottom = 25.0
+theme_override_fonts/font = ExtResource("1_fu88f")
+theme_override_font_sizes/font_size = 22
+text = "ESCAPE TIMER"
+
+[node name="Label" type="Label" parent="UI/EscapeTimer"]
+layout_mode = 0
+offset_top = 22.0
+offset_right = 43.0
+offset_bottom = 45.0
+theme_override_fonts/font = ExtResource("1_fu88f")
+theme_override_font_sizes/font_size = 11
+text = "TIME:"
