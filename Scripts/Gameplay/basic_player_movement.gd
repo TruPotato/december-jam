@@ -31,9 +31,9 @@ var parry        = true
 var thruster     = true
 
 # violence :D
-var base_atk    = 1 # variable in case we want there to be upgrades
-var maximum_atk = 3 # variable in case we want there to be upgrades
-var atk = 1 # this is the damage we will actually deal, may increase when doing a combo, using a skill, etc.
+var base_atk    = 3 # variable in case we want there to be upgrades
+var maximum_atk = 12 # variable in case we want there to be upgrades
+var atk # this is the damage we will actually deal, may increase when doing a combo, using a skill, etc.
 var damaged_enemy_this_frame = false # If an enemy was damaged on this frame, it is set to true. Does not seem very necessary but it's a nice safety measure.
 var there_are_things_to_attack = false # Important for groundpunding TToTT
 @onready var damage_indicator = preload("res://Scenes/Reusables/damage_indicator.tscn") # it's a variable but we won't vary it
@@ -377,8 +377,10 @@ func player_knockback(enemy):
 
 func spawn_damage_indicator(origin):
 	var instance = damage_indicator.instantiate()
+	var yellowness = 1.0-(atk-base_atk/float(maximum_atk-base_atk)) # make better tomorrow
 	instance.text = str(atk)
 	instance.position.y -= 16
+	instance.modulate = Color(1.0,yellowness,0.0,1)
 	origin.add_child(instance)
 
 #endregion
