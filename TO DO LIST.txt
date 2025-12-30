@@ -35,6 +35,10 @@ THINGS TO DO:
 			-   more complex projectile enemy?
 		-   jumping enemy?
 		-   more ideas if we have time
+	- ✓ begin level design work
+		-   finish 1 area
+		-   finish 1 boss
+		-   map?
 
 	-   dialog?
 	-   shop?
