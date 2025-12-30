@@ -26,6 +26,8 @@ var alive = true
 
 @onready var movement_body = $EnemyMovementBody
 
+@onready var damage_indicator = preload("res://Scenes/Reusables/damage_indicator.tscn") # it's a variable but we won't vary it
+
 func _ready():
 	movement_body.position = position
 	movement_body.direction = start_direction
@@ -50,12 +52,13 @@ func _physics_process(delta):
 			position = movement_body.position
 
 func player_took_damage():
+	#spawn_damage_indicator(self)
 	pass
 
 func enemy_took_damage(player):
 	health -= player.atk
 	
-	player.spawn_damage_indicator(self)
+	player.spawn_damage_indicator(self) 
 	
 	if health > 0:
 		# Regular hurt.
@@ -84,3 +87,11 @@ func defeat_enemy():
 	$EnemySprite.play("hurt")
 	await get_tree().create_timer(2.0).timeout
 	queue_free()
+
+func spawn_damage_indicator(origin): #for when the enemy hits the player
+	var instance = damage_indicator.instantiate()
+	instance.text = str(damage)
+	instance.position.y -= 16
+	instance.modulate = Color(1.0,0.3,0.5,1)
+	origin.add_child(instance)
+	pass

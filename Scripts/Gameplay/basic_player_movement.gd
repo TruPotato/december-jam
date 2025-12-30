@@ -35,7 +35,7 @@ var thruster     = true
 
 # violence :D
 var base_atk    = 1 # variable in case we want there to be upgrades
-var maximum_atk = 3 # variable in case we want there to be upgrades
+var maximum_atk = 10 # variable in case we want there to be upgrades
 var atk # this is the damage we will actually deal, may increase when doing a combo, using a skill, etc.
 var damaged_enemy_this_frame = false # If an enemy was damaged on this frame, it is set to true. Does not seem very necessary but it's a nice safety measure.
 var there_are_things_to_attack = false # Important for groundpunding TToTT
@@ -348,6 +348,7 @@ func player_get_hit(enemy): # Works with RECEIVEDAMAGE
 	just_got_hurt = true
 	last_enemy = enemy # important for determining knockback direction
 	print(health)
+	enemy.spawn_damage_indicator(self)
 
 func increase_combo():
 	atk += 1
@@ -361,12 +362,15 @@ func player_knockback(enemy):
 	velocity = Vector2(enemy.damage_knockback.x * knockback_direction,enemy.damage_knockback.y) #knock player up and away from the damage source
 	move_and_slide()
 
-func spawn_damage_indicator(origin):
+func spawn_damage_indicator(origin): # for when we hurt enemies
 	var instance = damage_indicator.instantiate()
-	var yellowness = 1.0-(atk-base_atk/float(maximum_atk-base_atk)) # make better tomorrow
+	var yellowness = 1.0-((atk-base_atk)/float(maximum_atk-base_atk))
+	var blueness = yellowness/1.5
+	print(str(yellowness))
+	print(str(blueness))
 	instance.text = str(atk)
 	instance.position.y -= 16
-	instance.modulate = Color(1.0,yellowness,0.0,1)
+	instance.modulate = Color(1.0,yellowness,blueness,1)
 	origin.add_child(instance)
 
 func escape(delta):
