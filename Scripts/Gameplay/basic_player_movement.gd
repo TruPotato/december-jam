@@ -19,9 +19,7 @@ enum { # These are possible gameplay states. It will probably become longer late
 	AIRBORNE,
 	DEAD,
 	HURT,
-	GROUNDPOUNDING,
-	CARRYING,
-	CARRYING_AIRBORNE
+	GROUNDPOUNDING
 }
 
 # skills. Do we have them? true or false
@@ -121,10 +119,6 @@ func state_machine(_delta): # Change the way the player moves based on the curre
 			dead(_delta);
 		GROUNDPOUNDING:
 			groundpounding(_delta);
-		CARRYING:
-			carrying(_delta);
-		CARRYING_AIRBORNE:
-			carrying_airborne(_delta);
 
 func grounded(_delta): # Grounded actions
 	# Get player input and do movement
@@ -135,11 +129,6 @@ func grounded(_delta): # Grounded actions
 	if Input.is_action_just_pressed("jump"): # If the player pressed the jump button...
 		# ...jump.
 		jump();
-	
-	# Using the debug key to change states to CARRYING for testing.
-	# TODO: figure out the real way we'll switch to the carrying state
-	if Input.is_action_just_pressed("debug_key"):
-		state = CARRYING;
 
 	if !is_on_floor(): # If we leave the ground for any reason, switch states to AIRBORNE.
 		state = AIRBORNE;
@@ -203,30 +192,6 @@ func groundpounding(_delta): # GO DOWN FAST UNTIL LAND (will need more behaviors
 		jumped = false;
 		coyote_time = coyote_default;
 		just_landed = true # Set for the sake of animation.
-
-func carrying(_delta):
-	movement(get_directional_input(), GROUND_FRICTION, H_SPEED * CARRYING_MULT); # make the player move slow
-	atk = base_atk; # kill the combo if that's even possible while carrying
-
-	if Input.is_action_just_pressed("debug_key"): # switch back to the grounded state for debug
-		state = GROUNDED;
-
-	if !is_on_floor(): # if you leave the ground, change states
-		state = CARRYING_AIRBORNE;
-
-func carrying_airborne(_delta):
-	movement(get_directional_input(), AIR_FRICTION, H_SPEED * CARRYING_MULT); # make the player move slow AND in the air
-
-	if velocity.y < 0: # Gravity. Do it harder after a while. The usual.
-		velocity.y += GRAVITY;
-	else:
-		velocity.y += GRAVITY * GRAVITY_MULT;
-
-	if is_on_floor(): # Same as airborne. This whole state is essentially just "airborne but slow and you can't jump" for now.
-		state = CARRYING;
-		jumped = false;
-		coyote_time = coyote_default;
-		just_landed = true;
 #endregion
 
 #region Animation
@@ -249,7 +214,7 @@ func animation_update():
 	var player_walking = false
 	# Check is player is airborne.
 	match state:
-		GROUNDED, CARRYING:
+		GROUNDED:
 			# Player is on the ground.
 			if abs(velocity.x) < 15.0:
 				# Player is still.
@@ -258,7 +223,7 @@ func animation_update():
 				# Player is walking, or at least moving horizontally on the ground.
 				player_sprite.change_animation_state(player_sprite.STATES.WALKING)
 				player_walking = true
-		AIRBORNE, CARRYING_AIRBORNE:
+		AIRBORNE:
 			# Player is in the air.
 			if velocity.y < 0.0:
 				# Player is rising.

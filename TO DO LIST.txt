@@ -16,15 +16,15 @@ THINGS TO DO:
 		-   more polish! more polish!! [bart gif]
 
 	- ✓ carrying states
-		-   finish airborne
+		-   finish airborne - donwscoping: no more carrying states
 		-   finish grounded
 
 	-   abilities
 		- ✓ obtension
 		- ✓ ground pound
-			-   hitbox fix
-			-   bouncing fix
-		-   fireball
+			- ✓ hitbox fix
+			- ✓ bouncing fix
+		-   fireball - downscoping: remove abilities past this line
 		-   parry
 		-   alchemical thruster
 	-   escape timer
