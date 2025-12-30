@@ -54,6 +54,9 @@ func player_took_damage():
 
 func enemy_took_damage(player):
 	health -= player.atk
+	
+	player.spawn_damage_indicator(self)
+	
 	if health > 0:
 		# Regular hurt.
 		enemy_got_hurt()

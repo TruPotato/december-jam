@@ -35,7 +35,8 @@ var base_atk    = 1 # variable in case we want there to be upgrades
 var maximum_atk = 3 # variable in case we want there to be upgrades
 var atk = 1 # this is the damage we will actually deal, may increase when doing a combo, using a skill, etc.
 var damaged_enemy_this_frame = false # If an enemy was damaged on this frame, it is set to true. Does not seem very necessary but it's a nice safety measure.
-var there_are_things_to_attack = false
+var there_are_things_to_attack = false # Important for groundpunding TToTT
+@onready var damage_indicator = preload("res://Scenes/Reusables/damage_indicator.tscn") # it's a variable but we won't vary it
 
 # Control movement
 var jumped = false; # Variable for determining if coyote time still applies and if downward velocity should be applied when releasing jump
@@ -373,5 +374,11 @@ func player_knockback(enemy):
 		knockback_direction = -1 # left
 	velocity = Vector2(enemy.damage_knockback.x * knockback_direction,enemy.damage_knockback.y) #knock player up and away from the damage source
 	move_and_slide()
+
+func spawn_damage_indicator(origin):
+	var instance = damage_indicator.instantiate()
+	instance.text = str(atk)
+	instance.position.y -= 16
+	origin.add_child(instance)
 
 #endregion
