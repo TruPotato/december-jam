@@ -1,9 +1,10 @@
-[gd_scene load_steps=5 format=4 uid="uid://df0lwtrsnbyhr"]
+[gd_scene load_steps=6 format=4 uid="uid://df0lwtrsnbyhr"]
 
 [ext_resource type="PackedScene" uid="uid://bt2dxigvk0kth" path="res://Scenes/player.tscn" id="1_dorj5"]
 [ext_resource type="PackedScene" uid="uid://c36mdljvd8373" path="res://Scenes/Reusables/ui_cam.tscn" id="1_rnym6"]
 [ext_resource type="PackedScene" uid="uid://gnxm0jmfcopl" path="res://Scenes/Reusables/basic_enemy.tscn" id="3_dorj5"]
 [ext_resource type="TileSet" uid="uid://btwcg30tnm4tb" path="res://Graphics/Tilesets/test_tiles.tres" id="3_rnym6"]
+[ext_resource type="PackedScene" uid="uid://b0ilv3pdqmhgf" path="res://Scenes/enemy_knight.tscn" id="5_wrd4j"]
 
 [node name="Node2D" type="Node2D"]
 
@@ -27,24 +28,22 @@ tile_set = ExtResource("3_rnym6")
 
 [node name="BasicEnemy" parent="." instance=ExtResource("3_dorj5")]
 position = Vector2(14, 371)
-health = 6
 
 [node name="BasicEnemy2" parent="." instance=ExtResource("3_dorj5")]
 position = Vector2(13, 450)
-health = 6
 
 [node name="BasicEnemy3" parent="." instance=ExtResource("3_dorj5")]
 position = Vector2(82, 471)
-health = 6
 
 [node name="BasicEnemy4" parent="." instance=ExtResource("3_dorj5")]
 position = Vector2(82, 471)
-health = 6
 
 [node name="BasicEnemy5" parent="." instance=ExtResource("3_dorj5")]
 position = Vector2(82, 471)
-health = 6
 
 [node name="BasicEnemy6" parent="." instance=ExtResource("3_dorj5")]
 position = Vector2(79, 471)
-health = 6
+
+[node name="EnemyKnight" parent="." instance=ExtResource("5_wrd4j")]
+position = Vector2(189, 475)
+start_direction = -1

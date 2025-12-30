@@ -1,0 +1,54 @@
+[gd_scene load_steps=7 format=3 uid="uid://b0ilv3pdqmhgf"]
+
+[ext_resource type="Script" uid="uid://6tppkf533wdq" path="res://Scripts/EnemyBehavior/enemy_knight.gd" id="1_fqtt2"]
+[ext_resource type="Texture2D" uid="uid://sion5fa01v42" path="res://Graphics/test_image.jpg" id="2_fghq0"]
+[ext_resource type="Script" uid="uid://br3u52mk7gx80" path="res://Scripts/EnemyBehavior/enemy_movement_basic.gd" id="3_hb5vn"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_8716h"]
+size = Vector2(12, 12)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_61ra6"]
+size = Vector2(14, 5)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_varo7"]
+size = Vector2(16, 16)
+
+[node name="EnemyKnight" type="Node2D"]
+script = ExtResource("1_fqtt2")
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+modulate = Color(1, 0, 0, 1)
+position = Vector2(0, -8)
+scale = Vector2(0.26666668, 0.26666668)
+texture = ExtResource("2_fghq0")
+region_enabled = true
+region_rect = Rect2(60, 12, 60, 60)
+
+[node name="PlayerIsHurtArea" type="Area2D" parent="."]
+collision_layer = 4
+collision_mask = 4
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="PlayerIsHurtArea"]
+position = Vector2(0, -7)
+shape = SubResource("RectangleShape2D_8716h")
+debug_color = Color(0.7, 0.19833331, 0, 0.41960785)
+
+[node name="EnemyIsHurtArea" type="Area2D" parent="."]
+collision_layer = 2
+collision_mask = 2
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="EnemyIsHurtArea"]
+position = Vector2(0, -16.5)
+shape = SubResource("RectangleShape2D_61ra6")
+debug_color = Color(0.55999994, 0.7, 0, 0.41960785)
+
+[node name="EnemyMovementBody" type="CharacterBody2D" parent="." node_paths=PackedStringArray("sprite")]
+top_level = true
+collision_layer = 0
+script = ExtResource("3_hb5vn")
+movement_mode = 1
+sprite = NodePath("")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="EnemyMovementBody"]
+position = Vector2(0, -8)
+shape = SubResource("RectangleShape2D_varo7")

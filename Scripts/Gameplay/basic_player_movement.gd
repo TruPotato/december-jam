@@ -45,8 +45,8 @@ var there_are_things_to_attack = false # Important for groundpunding TToTT
 var jumped = false; # Variable for determining if coyote time still applies and if downward velocity should be applied when releasing jump
 var state = GROUNDED; # Sets the default state to GROUNDED or 0.
 
-var max_health = 3.0; # Default health value. might change with levels?
-var health = 3.0; # You die when this is 0.
+var max_health = 8.0; # Default health value. might change with levels?
+var health = 8.0; # You die when this is 0.
 
 var coyote_default = 10; # Default coyote time so we can reset to it after each fall.
 var coyote_time; # Sets itself to the default when grounded; "coyote time" determines how long after leaving a ledge you can still jump.

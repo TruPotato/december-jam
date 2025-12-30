@@ -20,10 +20,10 @@ var direction: DIRECTIONS
 func _ready():
 	floor_snap_length = 3.5; # Stick to slopes
 	floor_constant_speed = true; # Don't slow down on slopes
-	if direction == DIRECTIONS.LEFT:
-		sprite.flip_h = true
-	else:
-		sprite.flip_h = false
+	#if direction == DIRECTIONS.LEFT: TODO:
+	#	sprite.flip_h = true
+	#else:
+	#	sprite.flip_h = false
 
 func movement_logic_loop(delta): # Default movement loop.
 	# Add the gravity.
@@ -31,10 +31,10 @@ func movement_logic_loop(delta): # Default movement loop.
 		velocity += get_gravity() * delta
 	match movement_mode:
 		MODES.WANDERING:
-			sprite.play("walk")
+		#	sprite.play("walk") TODO:
 			movement_wander(delta)
 		MODES.STILL:
-			sprite.play("idle")
+		#	sprite.play("idle") TODO:
 			move_and_slide()
 
 func movement_wander(_delta):
@@ -43,10 +43,10 @@ func movement_wander(_delta):
 	if is_on_wall(): # turn around after hitting a wall
 		direction *= -1
 	
-	if direction == DIRECTIONS.LEFT:
-		sprite.flip_h = true
-	else:
-		sprite.flip_h = false
+	#if direction == DIRECTIONS.LEFT: TODO:
+	#	sprite.flip_h = true
+	#else:
+	#	sprite.flip_h = false
 
 func movement_stopped(delta): # Used for when the enemy is staggered ie. when hurt or defeated.
 	velocity.x = 0.0
