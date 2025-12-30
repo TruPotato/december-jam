@@ -1,14 +1,15 @@
 [gd_scene load_steps=3 format=3 uid="uid://dgladmxqufl6x"]
 
 [ext_resource type="Script" uid="uid://cfedqqy13o7se" path="res://Scripts/Visuals/damage_indicator.gd" id="1_cagf6"]
-[ext_resource type="FontFile" uid="uid://c4uwm7m7pvmig" path="res://Graphics/POCKETPIXELREGULAR.TTF" id="1_q2wv7"]
+[ext_resource type="FontFile" uid="uid://84eralmscntv" path="res://Graphics/AstronauticalFont.ttf" id="1_q2wv7"]
 
 [node name="DamageIndicator" type="Label"]
-offset_left = -35.0
-offset_top = -11.0
-offset_right = 35.0
-offset_bottom = 12.0
+offset_left = -60.0
+offset_top = -5.0
+offset_right = 60.0
+offset_bottom = 18.0
 theme_override_fonts/font = ExtResource("1_q2wv7")
+theme_override_font_sizes/font_size = 11
 text = "lupuse :)"
 horizontal_alignment = 1
 script = ExtResource("1_cagf6")

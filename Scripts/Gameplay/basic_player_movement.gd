@@ -22,6 +22,11 @@ enum { # These are possible gameplay states. It will probably become longer late
 	GROUNDPOUNDING
 }
 
+# escape timer gunk
+const ESCAPE_TIMER_DEFAULT = 10.0;
+var remaining_time = 0.0;
+var escaping = false;
+
 # skills. Do we have them? true or false
 var ground_pound = true
 var fire_dash    = true
@@ -29,8 +34,8 @@ var parry        = true
 var thruster     = true
 
 # violence :D
-var base_atk    = 3 # variable in case we want there to be upgrades
-var maximum_atk = 12 # variable in case we want there to be upgrades
+var base_atk    = 1 # variable in case we want there to be upgrades
+var maximum_atk = 3 # variable in case we want there to be upgrades
 var atk # this is the damage we will actually deal, may increase when doing a combo, using a skill, etc.
 var damaged_enemy_this_frame = false # If an enemy was damaged on this frame, it is set to true. Does not seem very necessary but it's a nice safety measure.
 var there_are_things_to_attack = false # Important for groundpunding TToTT
@@ -61,6 +66,7 @@ var just_got_hurt = false # for now hehehehehe
 @onready var player_sprite = $PlayerSprite # The sprite node.
 @onready var sfx = $PlayerSFX; # The sounds.
 @onready var UI = get_tree().get_nodes_in_group("UI")[0]; # Gets the UI node, which is attached to the camera.
+@onready var escape_timer = UI.find_child("EscapeTimer");
 
 # Observe player's hurtbox
 @onready var ReceiveDamage = $ReceiveDamage
@@ -92,12 +98,26 @@ func _physics_process(delta):
 	
 	if health <= 0:
 		state = DEAD
+
+	# Debug gunk
+	# For now, this just starts the escape timer.
+	# Any REAL function that starts the escape timer will have to toggle these same variables.
+	if Input.is_action_just_pressed("debug_key"):
+		escaping = !escaping; # Toggles escaping (i.e. if it's true, set it to false; if it's false, set it to true)
+		escape_timer.visible = !escape_timer.visible; # Toggles the timer's visibility
+		remaining_time = ESCAPE_TIMER_DEFAULT; # Sets remaining time to the default
+	
+	# Escaping
+	if escaping:
+		escape(delta);
 	
 	# Decide what kind of action the player is doing
 	state_machine(delta)
 
 	# Apply physics and move.
 	move_and_slide()
+
+	# Ground pound stuff. we hit it with a hammer
 	if there_are_things_to_attack == true and state == GROUNDPOUNDING:
 		groundpound_attack()
 	there_are_things_to_attack = false
@@ -107,18 +127,18 @@ func _physics_process(delta):
 #endregion
 
 #region State Machine
-func state_machine(_delta): # Change the way the player moves based on the current type of action
+func state_machine(delta): # Change the way the player moves based on the current type of action
 	match state: # Check the current state and run some code based on its value
 		GROUNDED:
-			grounded(_delta);
+			grounded(delta);
 		AIRBORNE:
-			airborne(_delta);
+			airborne(delta);
 		HURT:
-			hurt(_delta);
+			hurt(delta);
 		DEAD:
-			dead(_delta);
+			dead(delta);
 		GROUNDPOUNDING:
-			groundpounding(_delta);
+			groundpounding(delta);
 
 func grounded(_delta): # Grounded actions
 	# Get player input and do movement
@@ -223,7 +243,7 @@ func animation_update():
 				# Player is walking, or at least moving horizontally on the ground.
 				player_sprite.change_animation_state(player_sprite.STATES.WALKING)
 				player_walking = true
-		AIRBORNE:
+		AIRBORNE, GROUNDPOUNDING:
 			# Player is in the air.
 			if velocity.y < 0.0:
 				# Player is rising.
@@ -348,4 +368,18 @@ func spawn_damage_indicator(origin):
 	instance.modulate = Color(1.0,yellowness,0.0,1)
 	origin.add_child(instance)
 
+func escape(delta):
+	# this doesn't need to be its own line, but i wanted to explain it specifically
+	# this makes a string out of the remaining time, using math to cut off the decimals past 10ths.
+	var remaining_time_str = str(round(remaining_time * pow(10.0, 1)) / pow(10.0, 1));
+
+	# Set's the escape timer's smaller text to the remaining time
+	escape_timer.get_child(0).text = "TIME: " + remaining_time_str;
+
+	# If we are not out of time, decrease the time in seconds
+	if remaining_time > 0:
+		remaining_time -= delta;
+	else: # If we are, contract lupuse
+		state = DEAD;
+		remaining_time = 0;
 #endregion

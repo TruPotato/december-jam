@@ -1,6 +1,7 @@
-[gd_scene load_steps=6 format=4 uid="uid://df0lwtrsnbyhr"]
+[gd_scene load_steps=7 format=4 uid="uid://df0lwtrsnbyhr"]
 
 [ext_resource type="PackedScene" uid="uid://bt2dxigvk0kth" path="res://Scenes/player.tscn" id="1_dorj5"]
+[ext_resource type="FontFile" uid="uid://84eralmscntv" path="res://Graphics/AstronauticalFont.ttf" id="1_rnym6"]
 [ext_resource type="PackedScene" uid="uid://gnxm0jmfcopl" path="res://Scenes/Reusables/basic_enemy.tscn" id="3_dorj5"]
 [ext_resource type="Texture2D" uid="uid://bq7t0dvhc8hkf" path="res://Graphics/test_tileset.png" id="7_8o3yo"]
 
@@ -61,6 +62,25 @@ offset_right = 349.0
 offset_bottom = 50.0
 pivot_offset = Vector2(0, 40)
 color = Color(1, 0, 0.3254902, 1)
+
+[node name="EscapeTimer" type="Label" parent="Camera2D/UI"]
+visible = false
+offset_left = 2.0
+offset_top = 2.0
+offset_right = 216.0
+offset_bottom = 25.0
+theme_override_fonts/font = ExtResource("1_rnym6")
+theme_override_font_sizes/font_size = 22
+text = "ESCAPE TIMER"
+
+[node name="Label" type="Label" parent="Camera2D/UI/EscapeTimer"]
+layout_mode = 0
+offset_top = 22.0
+offset_right = 43.0
+offset_bottom = 45.0
+theme_override_fonts/font = ExtResource("1_rnym6")
+theme_override_font_sizes/font_size = 11
+text = "TIME:"
 
 [node name="PlayerNode" parent="." instance=ExtResource("1_dorj5")]
 position = Vector2(-66, 436)

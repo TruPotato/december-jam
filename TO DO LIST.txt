@@ -27,7 +27,7 @@ THINGS TO DO:
 		-   fireball - downscoping: remove abilities past this line
 		-   parry
 		-   alchemical thruster
-	-   escape timer
+	- ✓ escape timer
 
 	-   more enemies
 		-   projectile enemy
