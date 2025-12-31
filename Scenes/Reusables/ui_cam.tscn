@@ -9,12 +9,18 @@ limit_left = -80
 limit_top = 45
 limit_right = 272
 limit_bottom = 506
+drag_horizontal_enabled = true
+drag_vertical_enabled = true
+drag_left_margin = 0.01
+drag_top_margin = 0.01
+drag_right_margin = 0.01
+drag_bottom_margin = 0.01
 
 [node name="UI" type="CanvasLayer" parent="." groups=["UI"]]
 
 [node name="Background" type="ColorRect" parent="UI"]
 offset_right = 360.0
-offset_bottom = 61.0
+offset_bottom = 48.0
 color = Color(0, 0, 0, 1)
 
 [node name="HealthLabel" type="Label" parent="UI"]
