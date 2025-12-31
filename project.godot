@@ -11,7 +11,7 @@ config_version=5
 [application]
 
 config/name="December Jam"
-run/main_scene="uid://df0lwtrsnbyhr"
+run/main_scene="uid://bkyxvp3yijnr1"
 config/features=PackedStringArray("4.5", "Forward Plus")
 run/max_fps=60
 config/icon="uid://brdpujqw58bn5"
