@@ -11,20 +11,30 @@ var hurt_time_length = 0.25 # How long the enemy is hurt for.
 var hurt_timer = 0.0 # The actual countdown.
 
 
-@export var health = 3
+@export var health = 6
 @export var damage = 1
 @export var damage_knockback = Vector2(50, -100) # The knockback after the player takes damage.
 @export var dealt_i_frames = 0.4 # How many i_frames the player gets after taking damage.
 @export var bounce_velocity = -80 # The burst of upward speed after bouncing off the enemy.
+
 enum DIRECTIONS {
 	LEFT = -1,
 	RIGHT = 1
 }
+
+enum LEDGE_RESPONSE {
+	FALL = 0,
+	TURN = 1
+}
+
 @export var start_direction: DIRECTIONS
+@export var ledge_response: LEDGE_RESPONSE
 
 var alive = true
 
 @onready var movement_body = $EnemyMovementBody
+@onready var ledge_detector_L = $LedgeDetectorL
+@onready var ledge_detector_R = $LedgeDetectorR
 
 @onready var damage_indicator = preload("res://Scenes/Reusables/damage_indicator.tscn") # it's a variable but we won't vary it
 
@@ -38,6 +48,7 @@ func _physics_process(delta):
 		STATES.NORMAL:
 			movement_body.movement_logic_loop(delta)
 			position = movement_body.position
+				
 		STATES.HURT:
 			movement_body.movement_stopped(delta)
 			position = movement_body.position
@@ -74,17 +85,18 @@ func enemy_took_damage(player):
 		defeat_enemy()
 
 func enemy_got_hurt():
-	$Hurt.play() # sound
-	$EnemyPlayer.play("hurt_flash")
-	$EnemySprite.play("hurt")
+	#$Hurt.play() # sound
+	#$EnemyPlayer.play("hurt_flash")
+	#$EnemySprite.play("hurt")
+	pass
 
 func defeat_enemy():
 	alive = false
 	# Disable hitboxes.
 	$PlayerIsHurtArea.process_mode = Node.PROCESS_MODE_DISABLED
 	$EnemyIsHurtArea.process_mode = Node.PROCESS_MODE_DISABLED
-	$EnemyPlayer.play("defeat_animation")
-	$EnemySprite.play("hurt")
+	#$EnemyPlayer.play("defeat_animation")
+	#$EnemySprite.play("hurt")
 	await get_tree().create_timer(2.0).timeout
 	queue_free()
 
@@ -94,3 +106,4 @@ func spawn_damage_indicator(origin): #for when the enemy hits the player
 	instance.position.y -= 16
 	instance.modulate = Color(1.0,0.3,0.5,1)
 	origin.add_child(instance)
+	pass

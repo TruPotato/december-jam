@@ -43,6 +43,17 @@ func movement_wander(_delta):
 	if is_on_wall(): # turn around after hitting a wall
 		direction *= -1
 	
+	# This code is bullshit that does nothing, I never had too much hope that this syntax would be correct anyways.   — Paul
+	match direction:
+		DIRECTIONS.LEFT:
+			if get_parent().has_node(str("LedgeDetectorR")):
+				if not get_parent().get_node(str("LedgeDetectorR")).has_overlapping_areas():
+					direction*=1
+		DIRECTIONS.RIGHT:
+			if get_parent().has_node("LedgeDetectorR"):
+				if not get_parent().get_node(str("LedgeDetectorR")).has_overlapping_areas():
+					direction*=1
+
 	#if direction == DIRECTIONS.LEFT: TODO:
 	#	sprite.flip_h = true
 	#else:

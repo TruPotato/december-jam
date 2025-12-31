@@ -1,10 +1,11 @@
-[gd_scene load_steps=6 format=4 uid="uid://df0lwtrsnbyhr"]
+[gd_scene load_steps=7 format=4 uid="uid://df0lwtrsnbyhr"]
 
 [ext_resource type="PackedScene" uid="uid://bt2dxigvk0kth" path="res://Scenes/player.tscn" id="1_dorj5"]
 [ext_resource type="PackedScene" uid="uid://c36mdljvd8373" path="res://Scenes/Reusables/ui_cam.tscn" id="1_rnym6"]
 [ext_resource type="PackedScene" uid="uid://gnxm0jmfcopl" path="res://Scenes/Reusables/basic_enemy.tscn" id="3_dorj5"]
 [ext_resource type="TileSet" uid="uid://btwcg30tnm4tb" path="res://Graphics/Tilesets/test_tiles.tres" id="3_rnym6"]
 [ext_resource type="PackedScene" uid="uid://b0ilv3pdqmhgf" path="res://Scenes/enemy_knight.tscn" id="5_wrd4j"]
+[ext_resource type="PackedScene" uid="uid://18wll7bctggn" path="res://Scenes/enemy_imp.tscn" id="6_o1aaj"]
 
 [node name="Node2D" type="Node2D"]
 
@@ -47,3 +48,13 @@ position = Vector2(79, 471)
 [node name="EnemyKnight" parent="." instance=ExtResource("5_wrd4j")]
 position = Vector2(189, 475)
 start_direction = -1
+
+[node name="Imp" parent="." instance=ExtResource("6_o1aaj")]
+position = Vector2(238, 440)
+start_direction = -1
+ledge_response = 1
+
+[node name="Imp2" parent="." instance=ExtResource("6_o1aaj")]
+position = Vector2(136, 396)
+start_direction = -1
+ledge_response = 1

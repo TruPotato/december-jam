@@ -1,0 +1,76 @@
+[gd_scene load_steps=9 format=3 uid="uid://18wll7bctggn"]
+
+[ext_resource type="Script" uid="uid://cvxl1asp4wew4" path="res://Scripts/EnemyBehavior/enemy_imp.gd" id="1_jovd0"]
+[ext_resource type="Texture2D" uid="uid://sion5fa01v42" path="res://Graphics/test_image.jpg" id="2_ugs2j"]
+[ext_resource type="Script" uid="uid://br3u52mk7gx80" path="res://Scripts/EnemyBehavior/enemy_movement_basic.gd" id="3_cr100"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_jovd0"]
+size = Vector2(12, 12)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_ugs2j"]
+size = Vector2(14, 5)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_xwsc7"]
+size = Vector2(16, 16)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_cr100"]
+size = Vector2(1, 1)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_druda"]
+size = Vector2(1, 1)
+
+[node name="Imp" type="Node2D"]
+script = ExtResource("1_jovd0")
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+modulate = Color(0.3702791, 0.4763475, 1, 1)
+position = Vector2(0, -8)
+scale = Vector2(0.26666668, 0.26666668)
+texture = ExtResource("2_ugs2j")
+region_enabled = true
+region_rect = Rect2(60, 12, 60, 60)
+
+[node name="PlayerIsHurtArea" type="Area2D" parent="."]
+collision_layer = 4
+collision_mask = 4
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="PlayerIsHurtArea"]
+position = Vector2(0, -7)
+shape = SubResource("RectangleShape2D_jovd0")
+debug_color = Color(0.7, 0.19833331, 0, 0.41960785)
+
+[node name="EnemyIsHurtArea" type="Area2D" parent="."]
+collision_layer = 2
+collision_mask = 2
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="EnemyIsHurtArea"]
+position = Vector2(0, -16.5)
+shape = SubResource("RectangleShape2D_ugs2j")
+debug_color = Color(0.55999994, 0.7, 0, 0.41960785)
+
+[node name="EnemyMovementBody" type="CharacterBody2D" parent="." node_paths=PackedStringArray("sprite")]
+top_level = true
+collision_layer = 0
+script = ExtResource("3_cr100")
+movement_mode = 1
+sprite = NodePath("")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="EnemyMovementBody"]
+position = Vector2(0, -8)
+shape = SubResource("RectangleShape2D_xwsc7")
+
+[node name="LedgeDetectorL" type="Area2D" parent="."]
+position = Vector2(-8, 0)
+collision_layer = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="LedgeDetectorL"]
+position = Vector2(-1, 1)
+shape = SubResource("RectangleShape2D_cr100")
+
+[node name="LedgeDetectorR" type="Area2D" parent="."]
+position = Vector2(8, 0)
+collision_layer = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="LedgeDetectorR"]
+position = Vector2(1, 1)
+shape = SubResource("RectangleShape2D_druda")
